@@ -1,0 +1,27 @@
+{
+    "name": "lemonblast/cbor4php",
+    "type": "library",
+    "description": "CBOR encoder/decoder for PHP",
+    "keywords": ["php","cbor"],
+    "homepage": "https://github.com/lemonblast/cbor4php",
+    "license": "MIT",
+    "authors": [
+        {"name": "Lukas Rezek", "email": "lukas@miratronix.com"}, 
+        {"name": "Adam Weber"}
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.0.19"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "src/"
+        }
+    },
+    "archive": {
+        "exclude": ["*/Tests", "phpunit.xml"]
+    },
+    "minimum-stability": "dev",
+}
