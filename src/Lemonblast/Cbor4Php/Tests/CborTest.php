@@ -61,6 +61,37 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(pack('C', 0b00111001) . pack('n', 499), $encoded);
     }
 
+    function testEncodeBoolTrue()
+    {
+        $encoded = Cbor::encode(true);
+
+        $this->assertEquals(pack('C', 0b11110101), $encoded);
+    }
+
+    function testEncodeBoolFalse()
+    {
+        $encoded = Cbor::encode(false);
+
+        $this->assertEquals(pack('C', 0b11110100), $encoded);
+    }
+
+    function testEncodeNull()
+    {
+        $encoded = Cbor::encode(null);
+
+        $this->assertEquals(pack('C', 0b11110110), $encoded);
+    }
+
+    function testEncodeUnknown()
+    {
+        /// XXX: This needs to be replaced with a vfs file so that there is no platform dependence
+        $f = fopen("/dev/null", "r");
+        fclose($f);
+        $encoded = Cbor::encode($f);
+
+        $this->assertEquals(pack('C', 0b11110111), $encoded);
+    }
+
     function testDecode()
     {
 
