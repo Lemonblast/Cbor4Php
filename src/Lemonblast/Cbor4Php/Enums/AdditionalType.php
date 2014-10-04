@@ -6,8 +6,8 @@
  * Class AdditionalType
  * @package Lemonblast\Cbor4Php\Types
  */
-class AdditionalType
-{
+class AdditionalType {
+
     const BIT_MASK = 0x1f;
     const MAX_VALUE = 23;
 

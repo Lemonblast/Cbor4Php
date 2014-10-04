@@ -6,9 +6,8 @@
  * Class PackFormat
  * @package Lemonblast\Cbor4Php\Enums
  */
+class PackFormat {
 
-class PackFormat
-{
     const UINT_8 = "C";
     const UINT_16 = "n";
     const UINT_32 = "N";

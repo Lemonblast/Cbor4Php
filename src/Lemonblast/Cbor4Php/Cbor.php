@@ -11,8 +11,8 @@ use Lemonblast\Cbor4Php\Enums\Max;
  * Class Cbor
  * @package Lemonblast\Cbor4Php
  */
-class Cbor
-{
+class Cbor {
+
     /**
      * Encodes the supplied value into a CBOR string.
      *

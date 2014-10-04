@@ -6,8 +6,7 @@
  * Class MAJOR_TYPE
  * @package Lemonblast\Cbor4Php\Types
  */
-abstract class MajorType
-{
+abstract class MajorType {
     const BIT_MASK = 0xe0;
 
     const POSITIVE_INT = 0b000000;
