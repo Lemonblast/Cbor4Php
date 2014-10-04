@@ -209,7 +209,7 @@ class Cbor {
         $data = self::encodeValue(MajorType::SEQUENCE, $length);
 
         // Encode each item and append to output
-        foreach($sequence as $item)
+        foreach ($sequence as $item)
         {
             $data .= self::encode($item);
         }
@@ -217,9 +217,33 @@ class Cbor {
         return $data;
     }
 
+    /**
+     * Encodes a map (associative array).
+     *
+     * @param array $array The array to encode.
+     * @return string The encoded byte string.
+     * @throws CborException If the array is too long to be encoded in CBOR.
+     */
     private static function encodeMap($array)
     {
-        return null;
+        $length = count($array);
+
+        if ($length > Max::UINT_64)
+        {
+            throw new CborException("Array is too long to be encoded in CBOR.");
+        }
+
+        // Encode the length
+        $data = self::encodeValue(MajorType::MAP, $length);
+
+        // Encode each key-value pair
+        foreach ($array as $key => $value)
+        {
+            $data .= self::encode($key);
+            $data .= self::encode($value);
+        }
+
+        return $data;
     }
 
     /**
