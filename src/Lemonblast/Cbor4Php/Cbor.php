@@ -23,12 +23,20 @@ class Cbor {
     {
         switch(gettype($decoded))
         {
-            case "boolean":
-            case "double":
-//                return self::encodeSimple($decoded);
-
             case "integer":
                 return self::encodeInteger($decoded);
+
+            case "double":
+                // Extremely large ints return "double" due to a bug, this makes sure it won't happen
+                if(floor($decoded) == $decoded)
+                {
+                    return self::encodeInteger($decoded);
+                }
+
+                // Otherwise, it's a float, and fall-through to encode simple
+
+            case "boolean":
+                return self::encodeSimple($decoded);
 
             case "array":
                 return self::encodeArray($decoded);
