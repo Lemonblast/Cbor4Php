@@ -110,13 +110,13 @@ class Cbor
     }
 
     /**
-     * Constructs the first byte of the cbor string, using the major type and additional information.
+     * Constructs the first byte of a cbor data type, using the major type and additional information.
      *
      * @param $major
      * @param $additional
      * @return string
      */
-    private static function makeFirstByte($major, $additional)
+    private static function encodeFirstByte($major, $additional)
     {
         return pack('C', $major | $additional);
     }
