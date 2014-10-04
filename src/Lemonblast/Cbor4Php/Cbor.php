@@ -85,31 +85,31 @@ class Cbor {
      * Encodes an data type length into a CBOR string
      *
      * @param $major_type The MajorType enum to set the first byte.
-     * @param $length Length of data to encode.
+     * @param $value Length of data to encode.
      * @return string Cbor String.
      * @throws CborException If the length is too large.
      */
-    private static function encodeLength($major_type, $length)
+    private static function encodeValue($major_type, $value)
     {
         switch(true)
         {
-            case $length <= AdditionalType::MAX_VALUE:
-                return self::encodeFirstByte($major_type, $length);
+            case $value <= AdditionalType::MAX_VALUE:
+                return self::encodeFirstByte($major_type, $value);
 
-            case $length <= Max::UINT_8:
-                return self::encodeFirstByte($major_type, AdditionalType::UINT_8) . pack(PackFormat::UINT_8, $length);
+            case $value <= Max::UINT_8:
+                return self::encodeFirstByte($major_type, AdditionalType::UINT_8) . pack(PackFormat::UINT_8, $value);
 
-            case $length <= Max::UINT_16:
-                return self::encodeFirstByte($major_type, AdditionalType::UINT_16) . pack(PackFormat::UINT_16, $length);
+            case $value <= Max::UINT_16:
+                return self::encodeFirstByte($major_type, AdditionalType::UINT_16) . pack(PackFormat::UINT_16, $value);
 
-            case $length <= Max::UINT_32:
-                return self::encodeFirstByte($major_type, AdditionalType::UINT_32) . pack(PackFormat::UINT_32, $length);
+            case $value <= Max::UINT_32:
+                return self::encodeFirstByte($major_type, AdditionalType::UINT_32) . pack(PackFormat::UINT_32, $value);
 
-            case $length <= Max::UINT_64:
-                return self::encodeFirstByte($major_type, AdditionalType::UINT_64) . pack(PackFormat::UINT_64, $length >> 32, $length & 0xffffffff);
+            case $value <= Max::UINT_64:
+                return self::encodeFirstByte($major_type, AdditionalType::UINT_64) . pack(PackFormat::UINT_64, $value >> 32, $value & 0xffffffff);
 
             default:
-                throw new CborException("Data type length is too long to be encoded in CBOR.");
+                throw new CborException("Value is too large to be encoded in CBOR.");
         }
     }
 
@@ -138,7 +138,7 @@ class Cbor {
             throw new CborException("The input integer is too large to be encoded in CBOR.");
         }
 
-        return self::encodeLength($major, $int);
+        return self::encodeValue($major, $int);
     }
 
     private static function encodeDouble($double)
@@ -167,7 +167,7 @@ class Cbor {
             throw new CborException("String is too long to be encoded in CBOR.");
         }
 
-        $data = self::encodeLength(MajorType::UTF8_STRING, $length);
+        $data = self::encodeValue(MajorType::UTF8_STRING, $length);
 
         for ($i = 0; $i < $length; $i++)
         {
