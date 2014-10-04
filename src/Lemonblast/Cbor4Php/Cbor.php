@@ -177,9 +177,32 @@ class Cbor {
         return $data;
     }
 
-    private static function encodeSequence($array)
+    /**
+     * Encodes a sequence (array).
+     *
+     * @param array $sequence The array to encode.
+     * @return string Byte string.
+     * @throws CborException If the array is too long to be encoded in CBOR.
+     */
+    private static function encodeSequence($sequence)
     {
-        return null;
+        $length = count($sequence);
+
+        if ($length > Max::UINT_64)
+        {
+            throw new CborException("Array is too long to be encoded in CBOR.");
+        }
+
+        // Encode the length
+        $data = self::encodeValue(MajorType::SEQUENCE, $length);
+
+        // Encode each item and append to output
+        foreach($sequence as $item)
+        {
+            $data .= self::encode($item);
+        }
+
+        return $data;
     }
 
     private static function encodeMap($array)
