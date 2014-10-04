@@ -47,15 +47,15 @@ class Cbor {
                 return self::encodeString($decoded);
 
             case "array":
-                // If the array has sequential keys from 0 to n then assume we are dealing with a list
+                // If the array doesn't have sequential keys from 0 to n then assume we are dealing with a map
                 if (array_keys($decoded) !== range (0, count($decoded) - 1))
                 {
-                    return self::encodeSequence($decoded);
+                    return self::encodeMap($decoded);
                 }
-                // Otherwise it's a map
+                // Otherwise it's a sequence
                 else
                 {
-                    return self::encodeMap($decoded);
+                    return self::encodeSequence($decoded);
                 }
 
             case "NULL":
