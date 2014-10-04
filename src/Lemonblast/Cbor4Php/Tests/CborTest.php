@@ -41,7 +41,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $encoded = Cbor::encode(18446744073709551615);
 
         $first = 18446744073709551615 >> 32;
-        $second = 18446744073709551615 & 0x00000000ffffffff;
+        $second = 18446744073709551615 & 0xffffffff;
 
         // Should be a byte string of 27, 18446744073709551615
         $this->assertEquals(pack('C', 27) . pack('NN', $first, $second), $encoded);
