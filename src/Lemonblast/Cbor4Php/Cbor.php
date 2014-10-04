@@ -119,7 +119,7 @@ class Cbor
     private static function encodeFirstByte($major, $additional)
     {
         $firstByte = ($major & MajorType::BIT_MASK) | ($additional & AdditionalType::BIT_MASK);
-        return pack('C', $firstByte);
+        return pack(PackFormat::UINT_8, $firstByte);
     }
 }
 
