@@ -13,6 +13,8 @@ use Lemonblast\Cbor4Php\Enums\Max;
  */
 class Cbor {
 
+    const STRING_ENCODING = "UTF-8";
+
     /**
      * Encodes the supplied value into a CBOR string.
      *
@@ -32,22 +34,38 @@ class Cbor {
                 {
                     return self::encodeInteger($decoded);
                 }
-
-                // Otherwise, it's a float, and fall-through to encode simple
+                // Otherwise, it's a float
+                else
+                {
+                    return self::encodeDouble($decoded);
+                }
 
             case "boolean":
-                return self::encodeSimple($decoded);
-
-            case "array":
-                return self::encodeArray($decoded);
+                return self::encodeBoolean($decoded);
 
             case "string":
                 return self::encodeString($decoded);
 
+            case "array":
+                // If the array has sequential keys from 0 to n then assume we are dealing with a list
+                if (array_keys($decoded) !== range (o, count($decoded) - 1))
+                {
+                    return self::encodeList($decoded);
+                }
+                // Otherwise it's a map
+                else
+                {
+                    return self::encodeMap($decoded);
+                }
+
+            case "NULL":
+                return self::encodeNull();
+
+            case "unknown type":
+                return self::encodeUndefined();
+
             case "object":
             case "resource":
-            case "NULL":
-            case "unknown type":
             default:
                 return null;
         }
@@ -104,6 +122,67 @@ class Cbor {
             default:
                 throw new CborException("The input integer is too large to be encoded in CBOR.");
         }
+    }
+
+    private static function encodeDouble($double)
+    {
+        return null;
+    }
+
+    private static function encodeBoolean($bool)
+    {
+        if ($bool)
+        {
+            return self::encodeFirstByte(MajorType::SIMPLE_AND_FLOAT, AdditionalType::SIMPLE_TRUE);
+        }
+        else
+        {
+            return self::encodeFirstByte(MajorType::SIMPLE_AND_FLOAT, AdditionalType::SIMPLE_FALSE);
+        }
+    }
+
+    private static function encodeString($string)
+    {
+        $length = mb_strlen($string, self::STRING_ENCODING);
+
+        if ($length > Max::UINT_64)
+        {
+            throw new CborException("String is too long to be encoded in CBOR.");
+        }
+
+        $data = self::encodeLength(MajorType::UTF8_STRING, $length);
+
+        for ($i = 0; $i < $length; $i++)
+        {
+            $mbchar = mb_substr($string, $i, 1);
+            $chars = strlen($mbchar);
+            for ($j = 0; $j < $chars; $j++)
+            {
+                $data .= pack(PackFormat::UINT_8, ord($mbchar[$j]));
+            }
+        }
+
+        return $data;
+    }
+
+    private static function encodeList($array)
+    {
+        return null;
+    }
+
+    private static function encodeMap($array)
+    {
+        return null;
+    }
+
+    private static function encodeNull()
+    {
+        return self::encodeFirstByte(MajorType::SIMPLE_AND_FLOAT, AdditionalType::SIMPLE_NULL);
+    }
+
+    private static function encodeUndefined()
+    {
+        return self::encodeFirstByte(MajorType::SIMPLE_AND_FLOAT, AdditionalType::SIMPLE_UNDEFINED);
     }
 
     /**
