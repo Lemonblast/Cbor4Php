@@ -14,6 +14,9 @@ class PackFormat {
 
     // Split into 2 32 bit packs
     const UINT_64 = "NN";
+
+    const FLOAT_32 = "f";
+    const FLOAT_64 = "d";
 }
 
 ?> 
