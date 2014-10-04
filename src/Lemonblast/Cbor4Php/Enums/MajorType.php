@@ -8,8 +8,8 @@
  */
 abstract class MajorType
 {
-    const UNSIGNED_INT = 0b000000;
-    const INT = 0b100000;
+    const POSITIVE_INT = 0b000000;
+    const NEGATIVE_INT = 0b100000;
     const BYTE_STRING = 0b1000000;
     const UTF8_STRING = 0b1100000;
     const ARRAY_TYPE = 0b10000000; // This has a _TYPE on it because ARRAY is a php keyword

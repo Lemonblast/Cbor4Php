@@ -66,14 +66,14 @@ class Cbor
         // Unsigned ints have a unsigned int major type and need to be converted to abs($val) - 1
         if($var < 0)
         {
-            $major = MajorType::INT;
+            $major = MajorType::NEGATIVE_INT;
             $var = abs($var) - 1;
         }
 
         // Regular ints don't need any conversion
         else
         {
-            $major = MajorType::UNSIGNED_INT;
+            $major = MajorType::POSITIVE_INT;
         }
 
         // If it's less than 23, you can just encode with the value as the additional info
