@@ -8,7 +8,7 @@
  */
 class AdditionalType {
 
-    const BIT_MASK = 0x1f;
+    const BIT_MASK = 0b00011111;
     const MAX_VALUE = 23;
 
     const INT_FALSE = 20;

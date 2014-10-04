@@ -7,7 +7,7 @@
  * @package Lemonblast\Cbor4Php\Types
  */
 abstract class MajorType {
-    const BIT_MASK = 0xe0;
+    const BIT_MASK = 0b11100000;
 
     const POSITIVE_INT = 0b000000;
     const NEGATIVE_INT = 0b100000;
