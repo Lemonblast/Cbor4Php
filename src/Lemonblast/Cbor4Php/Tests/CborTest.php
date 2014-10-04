@@ -92,6 +92,34 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(pack('C', 0b11110111), $encoded);
     }
 
+    function testStringEncodeEmpty()
+    {
+        $encoded = Cbor::encode("");
+
+        $this->assertEquals(pack('C', 0b01100000), $encoded);
+    }
+
+    function testStringEncodeCharacter()
+    {
+        $encoded = Cbor::encode("a");
+
+        $this->assertEquals(pack('CC', 0b1100001, 97), $encoded);
+    }
+
+    function testStringEncodeLowerAlphabet()
+    {
+        $encoded = Cbor::encode("abcdefghijklmnopqrstuvwxyz");
+
+        $this->assertEquals(pack('CCCCCCCCCCCCCCCCCCCCCCCCCCCC', 0b01111000, 0b11010, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122), $encoded);
+    }
+
+    function testStringEncodeUpperAlphabet()
+    {
+        $encoded = Cbor::encode("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+        $this->assertEquals(pack('CCCCCCCCCCCCCCCCCCCCCCCCCCCC', 0b01111000, 0b11010, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90), $encoded);
+    }
+
     function testDecode()
     {
 
