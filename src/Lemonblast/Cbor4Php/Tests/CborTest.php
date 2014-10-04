@@ -9,7 +9,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $encoded = Cbor::encode(10);
 
         // Should be a byte string of just 10
-        $this->assertEquals(pack('c', 10), $encoded);
+        $this->assertEquals(pack('C', 10), $encoded);
     }
 
     function testEncodeUINT8()
