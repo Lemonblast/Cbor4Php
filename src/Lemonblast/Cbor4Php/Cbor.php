@@ -58,16 +58,17 @@ class Cbor
     /**
      * Encodes an integer into a CBOR string.
      *
-     * @param $var
-     * @throws CborException
+     * @param $int Int to encode.
+     * @return string Cbor String.
+     * @throws CborException If the integer is too large.
      */
-    private static function encodeInteger($var)
+    private static function encodeInteger($int)
     {
         // Unsigned ints have a unsigned int major type and need to be converted to abs($val) - 1
-        if($var < 0)
+        if($int < 0)
         {
             $major = MajorType::NEGATIVE_INT;
-            $var = abs($var) - 1;
+            $int = abs($int) - 1;
         }
 
         // Regular ints don't need any conversion
