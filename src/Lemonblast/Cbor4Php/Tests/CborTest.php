@@ -49,7 +49,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testEncodeSuperLargeInt()
     {
-        $this->setExpectedException("Lemonblast\\Cbor4Php\\CborException", "The input integer is too large to be encoded in CBOR.");
+        $this->setExpectedException("Lemonblast\\Cbor4Php\\CborException", "Value is too large to be encoded in CBOR.");
 
         Cbor::encode(99999999999999999999);
     }
