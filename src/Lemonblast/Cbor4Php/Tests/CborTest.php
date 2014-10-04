@@ -8,7 +8,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
     {
         $encoded = Cbor::encode(10);
 
-        //Should be a byte string of just 10
+        // Should be a byte string of just 10
         $this->assertEquals(pack('c', 10), $encoded);
     }
 
@@ -16,7 +16,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
     {
         $encoded = Cbor::encode(255);
 
-        //Should be a byte string of 24, 140
+        // Should be a byte string of 24, 140
         $this->assertEquals(pack('C', 24) . pack('C', 255), $encoded);
     }
 
@@ -24,7 +24,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
     {
         $encoded = Cbor::encode(65535);
 
-        //Should be a byte string of 25, 140
+        // Should be a byte string of 25, 140
         $this->assertEquals(pack('C', 25) . pack('n', 65535), $encoded);
     }
 
@@ -32,7 +32,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
     {
         $encoded = Cbor::encode(4294967295);
 
-        //Should be a byte string of 26, 4294967295
+        // Should be a byte string of 26, 4294967295
         $this->assertEquals(pack('C', 26) . pack('N', 4294967295), $encoded);
     }
 
@@ -43,7 +43,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $first = 18446744073709551615 >> 32;
         $second = 18446744073709551615 & 0x00000000ffffffff;
 
-        //Should be a byte string of 27, 18446744073709551615
+        // Should be a byte string of 27, 18446744073709551615
         $this->assertEquals(pack('C', 27) . pack('NN', $first, $second), $encoded);
     }
 

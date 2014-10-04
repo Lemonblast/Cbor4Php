@@ -15,7 +15,7 @@ class AdditionalType
     const INT_NULL = 22;
     const INT_UNDEFINED = 23;
 
-    //Various sizes of uint
+    // Various sizes of uint
     const UINT_8 = 24;
     const UINT_16 = 25;
     const UINT_32 = 26;
@@ -24,7 +24,7 @@ class AdditionalType
     const FLOAT16 = 25;
     const FLOAT32 = 26;
     const FLOAT64 = 27;
-    const BREAK_TYPE = 31; //Break is a keyword in php, _TYPE appended
+    const BREAK_TYPE = 31; // Break is a keyword in php, _TYPE appended
 }
 
 ?> 

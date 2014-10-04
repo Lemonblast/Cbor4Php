@@ -63,20 +63,20 @@ class Cbor
      */
     private static function encodeInteger($var)
     {
-        //Unsigned ints have a unsigned int major type and need to be converted to abs($val) - 1
+        // Unsigned ints have a unsigned int major type and need to be converted to abs($val) - 1
         if($var < 0)
         {
             $major = MajorType::INT;
             $var = abs($var) - 1;
         }
 
-        //Regular ints don't need any conversion
+        // Regular ints don't need any conversion
         else
         {
             $major = MajorType::UNSIGNED_INT;
         }
 
-        //If it's less than 23, you can just encode with the value as the additional info
+        // If it's less than 23, you can just encode with the value as the additional info
         if($var <= Size::UINT_INLINE)
         {
             return self::makeFirstByte($major, $var);
@@ -95,10 +95,10 @@ class Cbor
         }
         else if($var <= Size::UINT_64)
         {
-            //Initialize the first byte
+            // Initialize the first byte
             $byteString = self::makeFirstByte($major, AdditionalType::UINT_64);
 
-            //64 bit values are not supported by pack, split it into 2 32bit packs
+            // 64 bit values are not supported by pack, split it into 2 32bit packs
             $byteString .= pack(PackFormat::UINT_64, $var >> 32, $var & 0xffffffff);
 
             return $byteString;
