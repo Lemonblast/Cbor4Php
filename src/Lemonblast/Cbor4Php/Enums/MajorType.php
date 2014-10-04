@@ -13,7 +13,7 @@ abstract class MajorType {
     const NEGATIVE_INT = 0b100000;
     const BYTE_STRING = 0b1000000;
     const UTF8_STRING = 0b1100000;
-    const ARRAY_TYPE = 0b10000000; // This has a _TYPE on it because ARRAY is a php keyword
+    const SEQUENCE = 0b10000000;
     const MAP = 0b10100000;
     const TAGS = 0b11000000;
     const SIMPLE_AND_FLOAT = 0b11100000;
