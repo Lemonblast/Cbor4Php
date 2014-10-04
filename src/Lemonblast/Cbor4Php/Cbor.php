@@ -82,12 +82,12 @@ class Cbor {
     }
 
     /**
-     * Encodes an data type length into a CBOR string
+     * Encodes a value into a CBOR string.
      *
-     * @param $major_type The MajorType enum to set the first byte.
-     * @param $value Length of data to encode.
-     * @return string Cbor String.
-     * @throws CborException If the length is too large.
+     * @param int $major_type The MajorType enum to set the first byte.
+     * @param int $value Value to encode.
+     * @return string The encoded byte string.
+     * @throws CborException If the value is too large.
      */
     private static function encodeValue($major_type, $value)
     {
@@ -116,9 +116,8 @@ class Cbor {
     /**
      * Encodes an integer into a CBOR string.
      *
-     * @param $int Int to encode.
-     * @return string Cbor String.
-     * @throws CborException If the integer is too large.
+     * @param int $int Int to encode.
+     * @return string The encoded byte string.
      */
     private static function encodeInteger($int)
     {
@@ -141,6 +140,12 @@ class Cbor {
         return null;
     }
 
+    /**
+     * Encodes a boolean value.
+     *
+     * @param boolean $bool The boolean to encode.
+     * @return string The encoded byte string.
+     */
     private static function encodeBoolean($bool)
     {
         if ($bool)
@@ -153,6 +158,13 @@ class Cbor {
         }
     }
 
+    /**
+     * Encodes a string.
+     *
+     * @param string $string String to encode.
+     * @return string The encoded byte string.
+     * @throws CborException If the string is too long to be encoded in CBOR.
+     */
     private static function encodeString($string)
     {
         $length = mb_strlen($string, self::STRING_ENCODING);
@@ -181,7 +193,7 @@ class Cbor {
      * Encodes a sequence (array).
      *
      * @param array $sequence The array to encode.
-     * @return string Byte string.
+     * @return string The encoded byte string.
      * @throws CborException If the array is too long to be encoded in CBOR.
      */
     private static function encodeSequence($sequence)
@@ -210,22 +222,32 @@ class Cbor {
         return null;
     }
 
+    /**
+     * Encodes a null value.
+     *
+     * @return string The encoded byte string.
+     */
     private static function encodeNull()
     {
         return self::encodeFirstByte(MajorType::SIMPLE_AND_FLOAT, AdditionalType::SIMPLE_NULL);
     }
 
+    /**
+     * Encodes a undefined value.
+     *
+     * @return string The encoded byte string.
+     */
     private static function encodeUndefined()
     {
         return self::encodeFirstByte(MajorType::SIMPLE_AND_FLOAT, AdditionalType::SIMPLE_UNDEFINED);
     }
 
     /**
-     * Constructs the first byte of a cbor data type, using the major type and additional information.
+     * Constructs the first byte of a CBOR data type, using the major type and additional information.
      *
-     * @param $major
-     * @param $additional
-     * @return string
+     * @param int $major The major type to use.
+     * @param int $additional The additional type to use.
+     * @return string The encoded byte string.
      */
     private static function encodeFirstByte($major, $additional)
     {
