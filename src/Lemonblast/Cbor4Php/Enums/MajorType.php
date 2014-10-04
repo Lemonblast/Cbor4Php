@@ -8,6 +8,8 @@
  */
 abstract class MajorType
 {
+    const BIT_MASK = 0xe0;
+
     const POSITIVE_INT = 0b000000;
     const NEGATIVE_INT = 0b100000;
     const BYTE_STRING = 0b1000000;
