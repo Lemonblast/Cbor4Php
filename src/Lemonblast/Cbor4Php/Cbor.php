@@ -78,8 +78,6 @@ class Cbor {
             $major = MajorType::NEGATIVE_INT;
             $int = abs($int) - 1;
         }
-
-        // Regular ints don't need any conversion
         else
         {
             $major = MajorType::POSITIVE_INT;
@@ -117,8 +115,8 @@ class Cbor {
      */
     private static function encodeFirstByte($major, $additional)
     {
-        $firstByte = ($major & MajorType::BIT_MASK) | ($additional & AdditionalType::BIT_MASK);
-        return pack(PackFormat::UINT_8, $firstByte);
+        $first_byte = ($major & MajorType::BIT_MASK) | ($additional & AdditionalType::BIT_MASK);
+        return pack(PackFormat::UINT_8, $first_byte);
     }
 }
 
