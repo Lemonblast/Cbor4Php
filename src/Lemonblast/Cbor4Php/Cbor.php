@@ -50,7 +50,7 @@ class Cbor {
                 // If the array has sequential keys from 0 to n then assume we are dealing with a list
                 if (array_keys($decoded) !== range (0, count($decoded) - 1))
                 {
-                    return self::encodeList($decoded);
+                    return self::encodeSequence($decoded);
                 }
                 // Otherwise it's a map
                 else
@@ -177,7 +177,7 @@ class Cbor {
         return $data;
     }
 
-    private static function encodeList($array)
+    private static function encodeSequence($array)
     {
         return null;
     }
