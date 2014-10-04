@@ -1,5 +1,11 @@
 <?php namespace Lemonblast\Cbor4Php\Enums;
 
+/**
+ * Contains pack formats for different data types.
+ *
+ * Class PackFormat
+ * @package Lemonblast\Cbor4Php\Enums
+ */
 
 class PackFormat
 {
