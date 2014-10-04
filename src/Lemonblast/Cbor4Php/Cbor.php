@@ -133,11 +133,6 @@ class Cbor {
             $major = MajorType::POSITIVE_INT;
         }
 
-        if ($int > Max::UINT_64)
-        {
-            throw new CborException("The input integer is too large to be encoded in CBOR.");
-        }
-
         return self::encodeValue($major, $int);
     }
 
