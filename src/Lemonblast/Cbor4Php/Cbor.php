@@ -3,7 +3,7 @@
 use Lemonblast\Cbor4Php\Enums\AdditionalType;
 use Lemonblast\Cbor4Php\Enums\MajorType;
 use Lemonblast\Cbor4Php\Enums\PackFormat;
-use Lemonblast\Cbor4Php\Enums\Size;
+use Lemonblast\Cbor4Php\Enums\Max;
 
 /**
  * Manages encoding and decoding of CBOR data.

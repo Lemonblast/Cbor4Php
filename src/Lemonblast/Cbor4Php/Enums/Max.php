@@ -6,9 +6,8 @@
  * Class Size
  * @package Lemonblast\Cbor4Php\Enums
  */
-class Size
-{
-    const UINT_INLINE = 23;
+class Max {
+
     const UINT_8 = 255;
     const UINT_16 = 65535;
     const UINT_32 = 4294967295;
