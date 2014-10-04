@@ -11,10 +11,10 @@ class AdditionalType {
     const BIT_MASK = 0b00011111;
     const MAX_VALUE = 23;
 
-    const INT_FALSE = 20;
-    const INT_TRUE = 21;
-    const INT_NULL = 22;
-    const INT_UNDEFINED = 23;
+    const SIMPLE_FALSE = 20;
+    const SIMPLE_TRUE = 21;
+    const SIMPLE_NULL = 22;
+    const SIMPLE_UNDEFINED = 23;
 
     // Various sizes of uint
     const UINT_8 = 24;
