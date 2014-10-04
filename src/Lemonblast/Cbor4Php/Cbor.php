@@ -48,7 +48,7 @@ class Cbor {
 
             case "array":
                 // If the array has sequential keys from 0 to n then assume we are dealing with a list
-                if (array_keys($decoded) !== range (o, count($decoded) - 1))
+                if (array_keys($decoded) !== range (0, count($decoded) - 1))
                 {
                     return self::encodeList($decoded);
                 }
