@@ -78,35 +78,25 @@ class Cbor
         }
 
         // If it's less than 23, you can just encode with the value as the additional info
-        if($var <= Size::UINT_INLINE)
+        switch(true)
         {
-            return self::makeFirstByte($major, $var);
-        }
-        else if($var <= Size::UINT_8)
-        {
-            return self::makeFirstByte($major, AdditionalType::UINT_8) . pack(PackFormat::UINT_8, $var);
-        }
-        else if($var <= Size::UINT_16)
-        {
-            return self::makeFirstByte($major, AdditionalType::UINT_16) . pack(PackFormat::UINT_16, $var);
-        }
-        else if($var <= Size::UINT_32)
-        {
-            return self::makeFirstByte($major, AdditionalType::UINT_32) . pack(PackFormat::UINT_32, $var);
-        }
-        else if($var <= Size::UINT_64)
-        {
-            // Initialize the first byte
-            $byteString = self::makeFirstByte($major, AdditionalType::UINT_64);
+            case $int <= AdditionalType::MAX_VALUE:
+                return self::encodeFirstByte($major, $int);
 
-            // 64 bit values are not supported by pack, split it into 2 32bit packs
-            $byteString .= pack(PackFormat::UINT_64, $var >> 32, $var & 0xffffffff);
+            case $int <= Max::UINT_8:
+                return self::encodeFirstByte($major, AdditionalType::UINT_8) . pack(PackFormat::UINT_8, $int);
 
-            return $byteString;
-        }
-        else
-        {
-            throw new CborException("The input integer is too large to be encoded in CBOR.");
+            case $int <= Max::UINT_16:
+                return self::encodeFirstByte($major, AdditionalType::UINT_16) . pack(PackFormat::UINT_16, $int);
+
+            case $int <= Max::UINT_32:
+                return self::encodeFirstByte($major, AdditionalType::UINT_32) . pack(PackFormat::UINT_32, $int);
+
+            case $int <= Max::UINT_64:
+                return self::encodeFirstByte($major, AdditionalType::UINT_64) . pack(PackFormat::UINT_64, $int >> 32, $int & 0xffffffff);
+
+            default:
+                throw new CborException("The input integer is too large to be encoded in CBOR.");
         }
     }
 
