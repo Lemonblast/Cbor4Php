@@ -54,6 +54,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
         Cbor::encode(99999999999999999999);
     }
 
+    function testEncodeSignedInt()
+    {
+        $encoded = Cbor::encode(-500);
+
+        $this->assertEquals(pack('C', 0b00111001) . pack('n', 499), $encoded);
+    }
+
     function testDecode()
     {
 
