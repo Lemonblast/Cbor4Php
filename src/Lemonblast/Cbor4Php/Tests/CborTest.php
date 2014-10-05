@@ -144,7 +144,8 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testEncodeDouble_64()
     {
-        $encoded = Cbor::encode(1.5, true);
+        Cbor::$ENCODE_DOUBLE_64_BIT = true;
+        $encoded = Cbor::encode(1.5);
 
         $this->assertEquals(pack('CCCCCCCCC', 0xfb, 0x3f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00,0x00), $encoded);
     }
