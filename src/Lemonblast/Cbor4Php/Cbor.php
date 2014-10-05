@@ -89,7 +89,7 @@ class Cbor {
      * @throws CborException
      * @return string The encoded byte string.
      */
-    private static function encodeValue($major_type, $value)
+    private static function encodeIntValue($major_type, $value)
     {
         switch(true)
         {
@@ -132,7 +132,7 @@ class Cbor {
             $major = MajorType::POSITIVE_INT;
         }
 
-        return self::encodeValue($major, $int);
+        return self::encodeIntValue($major, $int);
     }
 
     /**
@@ -216,7 +216,7 @@ class Cbor {
             throw new CborException("String is too long to be encoded in CBOR.");
         }
 
-        $data = self::encodeValue(MajorType::UTF8_STRING, $length);
+        $data = self::encodeIntValue(MajorType::UTF8_STRING, $length);
 
         for ($i = 0; $i < $length; $i++)
         {
@@ -248,7 +248,7 @@ class Cbor {
         }
 
         // Encode the length
-        $data = self::encodeValue(MajorType::SEQUENCE, $length);
+        $data = self::encodeIntValue(MajorType::SEQUENCE, $length);
 
         // Encode each item and append to output
         foreach ($sequence as $item)
@@ -276,7 +276,7 @@ class Cbor {
         }
 
         // Encode the length
-        $data = self::encodeValue(MajorType::MAP, $length);
+        $data = self::encodeIntValue(MajorType::MAP, $length);
 
         // Encode each key-value pair
         foreach ($array as $key => $value)
