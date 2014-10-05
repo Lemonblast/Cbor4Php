@@ -84,9 +84,10 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testEncodeUnknown()
     {
-        /// XXX: This needs to be replaced with a vfs file so that there is no platform dependence
-        $f = fopen("/dev/null", "r");
-        fclose($f);
+        // Open and close a resource, only way to get an unknown type in PHP.
+        $f = curl_init('http://www.fake.com');
+        curl_close($f);
+
         $encoded = Cbor::encode($f);
 
         $this->assertEquals(pack('C', 0b11110111), $encoded);
