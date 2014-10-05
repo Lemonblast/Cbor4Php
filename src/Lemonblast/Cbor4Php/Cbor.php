@@ -15,15 +15,15 @@ class Cbor {
 
     const STRING_ENCODING = "UTF-8";
 
-    public static $ENCODE_DOUBLE_64_BIT = false;
-
     /**
      * Encodes the supplied value into a CBOR string.
      *
      * @param mixed $decoded Data to encode.
+     * @param bool $float_64 Optional flag to force 64 bit encoding for floats.
+     * @throws CborException
      * @return mixed Encoded string.
      */
-    public static function encode($decoded)
+    public static function encode($decoded, $float_64 = false)
     {
         switch(gettype($decoded))
         {
@@ -39,7 +39,7 @@ class Cbor {
                 // Otherwise, it's a float
                 else
                 {
-                    return self::encodeDouble($decoded);
+                    return self::encodeDouble($decoded, $float_64);
                 }
 
             case "boolean":
@@ -141,14 +141,15 @@ class Cbor {
      * Encodes a double into a CBOR string.
      *
      * @param float $double The double to encode.
+     * @param bool $float_64 Optional flag to force 64 bit encoding.
      * @return string The encoded byte string.
      */
-    private static function encodeDouble($double)
+    private static function encodeDouble($double, $float_64 = false)
     {
         $major = MajorType::SIMPLE_AND_FLOAT;
 
         // If the encode doubles in 64 bit flag is set
-        if(self::$ENCODE_DOUBLE_64_BIT)
+        if($float_64)
         {
             return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . strrev(pack(PackFormat::FLOAT_64, $double));
         }
