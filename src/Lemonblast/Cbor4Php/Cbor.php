@@ -15,6 +15,8 @@ class Cbor {
 
     const STRING_ENCODING = "UTF-8";
 
+    public static $ENCODE_DOUBLE_64_BIT = false;
+
     /**
      * Encodes the supplied value into a CBOR string.
      *
@@ -145,41 +147,14 @@ class Cbor {
     {
         $major = MajorType::SIMPLE_AND_FLOAT;
 
-        // Do the pack as a 32 bit float.
-        $float_32 = pack(PackFormat::FLOAT_32, $double);
-
-        // Convert to array
-        $bytes = str_split($float_32);
-
-        // Check if only the first 2 bytes are zero (making it a 16 bit float)
-        if (ord($bytes[0]) == 0 && ord($bytes[1]) == 0 && (ord($bytes[2]) != 0 || ord($bytes[3]) != 0))
+        // If the encode doubles in 64 bit flag is set
+        if(self::$ENCODE_DOUBLE_64_BIT)
         {
-            $additional = AdditionalType::FLOAT_16;
-            $data = strrev(substr($float_32, 2)); // Remove 2 bytes (16 bits)
-        }
-        else
-        {
-            // Pack it as a 64 bit float
-            $float_64 = pack(PackFormat::FLOAT_64, $double);
-
-            // Convert to array
-            $bytes = str_split($float_64);
-
-            // Check if the first 4 bytes are zero (making it a 32 bit float) - This never happens cause a pack 64 uses all 64 bits...
-            if (ord($bytes[0]) == 0 && ord($bytes[1]) == 0 && ord($bytes[2]) == 0 && ord($bytes[3]) == 0)
-            {
-                $additional = AdditionalType::FLOAT_32;
-                $data = strrev(substr($float_64, 4)); // Remove 4 bytes (32 bits)
-            }
-            else
-            {
-                // It's a 64 bit float
-                $additional = AdditionalType::FLOAT_64;
-                $data = strrev($float_64);
-            }
+            return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . strrev(pack(PackFormat::FLOAT_64, $double));
         }
 
-        return self::encodeFirstByte($major, $additional) . $data;
+        // Default to 32 bit (16 is not supported by PHP)
+        return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . strrev(pack(PackFormat::FLOAT_32, $double));
     }
 
     /**
