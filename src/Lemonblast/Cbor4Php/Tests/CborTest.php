@@ -134,18 +134,19 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(pack('CCCCCCC', 0b10100011, 0b00000001, 0b00000001, 0b00000010, 0b00000010, 0b00000011, 0b00000011), $encoded);
     }
 
-    function testEncodeDouble_16()
+    function testEncodeDouble_32()
     {
         $encoded = Cbor::encode(1.5);
 
-        $this->assertEquals(pack('CCC', 0xf9, 0x3f, 0xc0), $encoded);
+        $this->assertEquals(pack('CCCCC', 0xfa, 0x3f, 0xc0, 0x00, 0x00), $encoded);
     }
 
-    function testEncodeDouble_32()
+    function testEncodeDouble_64()
     {
-        $encoded = Cbor::encode(1.80107562924e-226);
+        Cbor::$ENCODE_DOUBLE_64_BIT = true;
+        $encoded = Cbor::encode(1.5);
 
-        $this->assertEquals(pack('CCCCC', 0xfa, 0x11, 0x11, 0x11, 0x11), $encoded);
+        $this->assertEquals(pack('CCCCCCCCC', 0xfb, 0x3f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00,0x00), $encoded);
     }
 
     function testDecode()
