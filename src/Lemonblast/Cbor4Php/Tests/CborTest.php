@@ -85,7 +85,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
     function testEncodeUnknown()
     {
         // Open and close a resource, only way to get an unknown type in PHP.
-        $f = curl_init('http://www.fake.com');
+        $f = curl_init('localhost');
         curl_close($f);
 
         $encoded = Cbor::encode($f);
