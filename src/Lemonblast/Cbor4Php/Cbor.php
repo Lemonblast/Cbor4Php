@@ -84,7 +84,7 @@ class Cbor {
     public static function decode($encoded)
     {
         // Trying to decode null, eh?
-        if(is_null($encoded) || empty($encoded))
+        if (is_null($encoded) || empty($encoded))
         {
             return null;
         }
@@ -94,7 +94,7 @@ class Cbor {
 
         // Convert the character array to an array of bytes
         $bytes = array();
-        foreach($chars as $char)
+        foreach ($chars as $char)
         {
             $bytes[] = ord($char);
         }
@@ -205,7 +205,7 @@ class Cbor {
 
         // Construct the value
         $value = 0;
-        for($i = $length-1; $i >= 0; $i--)
+        for ($i = $length-1; $i >= 0; $i--)
         {
             $value += array_shift($bytes) << ($i * 8);
         }
