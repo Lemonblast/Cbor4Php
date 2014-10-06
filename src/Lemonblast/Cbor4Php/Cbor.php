@@ -218,7 +218,7 @@ class Cbor {
         {
             $byte = array_shift($bytes);
 
-            if(is_null($byte))
+            if (is_null($byte))
             {
                 throw new CborException("The supplied byte string isn't long enough to hold an int $length bytes long.");
             }
