@@ -205,7 +205,7 @@ class Cbor {
 
         // Construct the value
         $value = 0;
-        for($i = 0; $i < $length; $i++)
+        for($i = $length-1; $i >= 0; $i--)
         {
             $value += array_shift($bytes) << ($i * 8);
         }
