@@ -182,6 +182,7 @@ class Cbor {
      *
      * @param int $first First byte.
      * @param array $bytes Remaining bytes in string.
+     * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return int Decoded integer.
      */
     private static function decodeIntValue($first, &$bytes)
@@ -215,7 +216,14 @@ class Cbor {
         $value = 0;
         for ($i = $length-1; $i >= 0; $i--)
         {
-            $value += array_shift($bytes) << ($i * 8);
+            $byte = array_shift($bytes);
+
+            if(is_null($byte))
+            {
+                throw new CborException("The supplied byte string isn't long enough to hold an int $length bytes long.");
+            }
+
+            $value += $byte << ($i * 8);
         }
 
         return $value;
