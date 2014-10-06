@@ -101,10 +101,10 @@ class Cbor {
         switch($major)
         {
             case MajorType::POSITIVE_INT:
-                return self::decodeIntegerValue($first, $bytes);
+                return self::decodeIntValue($first, $bytes);
 
             case MajorType::NEGATIVE_INT:
-                $decoded = self::decodeIntegerValue($first, $bytes);
+                $decoded = self::decodeIntValue($first, $bytes);
 
                 // Apply negative number logic
                 $decoded += 1;
@@ -156,6 +156,40 @@ class Cbor {
 
             default:
                 throw new CborException("Value is too large to be encoded in CBOR.");
+        }
+    }
+
+    /**
+     * Decodes an integer value, based on the first byte and additional data.
+     *
+     * @param int $first First byte.
+     * @param array $remainder Remaining bytes in string.
+     * @return int Decoded integer.
+     */
+    private static function decodeIntValue($first, $remainder)
+    {
+        // Copy byte string to intermediate variable
+        $bytes = $remainder;
+
+        // Grab additional type from first byte
+        $additional = $first & AdditionalType::BIT_MASK;
+
+        switch($additional)
+        {
+            case AdditionalType::UINT_8:
+                return array_shift($bytes);
+
+            case AdditionalType::UINT_16:
+                return array_shift($bytes) << 8 & array_shift($bytes);
+
+            case AdditionalType::UINT_32:
+                return array_shift($bytes) << 16 & array_shift($bytes) << 8 & array_shift($bytes);
+
+            case AdditionalType::UINT_64:
+                return array_shift($bytes) << 24 & array_shift($bytes) << 16 & array_shift($bytes) << 8 & array_shift($bytes);
+
+            default:
+                return $additional;
         }
     }
 
