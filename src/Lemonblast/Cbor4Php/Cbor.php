@@ -175,14 +175,11 @@ class Cbor {
      * Decodes an integer value, based on the first byte and additional data.
      *
      * @param int $first First byte.
-     * @param array $remainder Remaining bytes in string.
+     * @param array $bytes Remaining bytes in string.
      * @return int Decoded integer.
      */
-    private static function decodeIntValue($first, $remainder)
+    private static function decodeIntValue($first, &$bytes)
     {
-        // Copy byte string to intermediate variable
-        $bytes = $remainder;
-
         // Grab additional type from first byte
         $additional = $first & AdditionalType::BIT_MASK;
 
