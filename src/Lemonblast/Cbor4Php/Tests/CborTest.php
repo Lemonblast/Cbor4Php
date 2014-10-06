@@ -57,6 +57,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(pack('C', 26) . pack('N', 4294967295), $encoded);
     }
 
+    function testDecodeUINT32()
+    {
+        $decoded = Cbor::decode(pack('C', 26) . pack('N', 4294967295));
+
+        $this->assertEquals(4294967295, $decoded);
+    }
+
     function testEncodeUINT64()
     {
         $encoded = Cbor::encode(18446744073709551615);
