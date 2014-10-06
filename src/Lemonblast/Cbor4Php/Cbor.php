@@ -108,7 +108,7 @@ class Cbor {
      * @param array $bytes Byte array.
      * @throws CborException If the byte array is not valid.
      */
-    private static function recursiveDecode(&$bytes = null)
+    private static function recursiveDecode(&$bytes)
     {
         // Grab the first byte
         $first = array_shift($bytes);
