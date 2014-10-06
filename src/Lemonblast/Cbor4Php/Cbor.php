@@ -187,13 +187,13 @@ class Cbor {
                 return array_shift($bytes);
 
             case AdditionalType::UINT_16:
-                return array_shift($bytes) << 8 & array_shift($bytes);
+                return (array_shift($bytes) << 8) + (array_shift($bytes));
 
             case AdditionalType::UINT_32:
-                return array_shift($bytes) << 16 & array_shift($bytes) << 8 & array_shift($bytes);
+                return (array_shift($bytes) << 16) + (array_shift($bytes) << 8) + (array_shift($bytes));
 
             case AdditionalType::UINT_64:
-                return array_shift($bytes) << 24 & array_shift($bytes) << 16 & array_shift($bytes) << 8 & array_shift($bytes);
+                return (array_shift($bytes) << 24) + (array_shift($bytes) << 16) + (array_shift($bytes) << 8) + (array_shift($bytes));
 
             default:
                 return $additional;
