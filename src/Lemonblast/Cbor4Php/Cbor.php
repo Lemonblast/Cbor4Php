@@ -82,28 +82,29 @@ class Cbor {
      * @param null $bytes An array of bytes (from another decode method).
      * @throws CborException If the major type makes no sense.
      */
-    public static function decode($encoded, &$bytes = null)
+    public static function decode($encoded)
     {
         // Trying to decode null, eh?
-        if ((is_null($encoded) || empty($encoded)) && is_null($bytes))
+        if (is_null($encoded) || empty($encoded))
         {
             return null;
         }
 
-        // Decoding a string
-        if (is_null($bytes))
-        {
-            // Unpack into array of characters
-            $chars = str_split($encoded);
+        // Unpack into array of characters
+        $chars = str_split($encoded);
 
-            // Convert the character array to an array of bytes
-            $bytes = array();
-            foreach ($chars as $char)
-            {
-                $bytes[] = ord($char);
-            }
+        // Convert the character array to an array of bytes
+        $bytes = array();
+        foreach ($chars as $char)
+        {
+            $bytes[] = ord($char);
         }
 
+        return self::recursiveDecode($bytes);
+    }
+
+    private static function recursiveDecode(&$bytes = null)
+    {
         // Grab the first byte
         $first = array_shift($bytes);
 
