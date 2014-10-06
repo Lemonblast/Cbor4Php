@@ -102,6 +102,12 @@ class Cbor {
         return self::recursiveDecode($bytes);
     }
 
+    /**
+     * Does a decode from an array of bytes passed by reference.
+     *
+     * @param array $bytes Byte array.
+     * @throws CborException If the byte array is not valid.
+     */
     private static function recursiveDecode(&$bytes = null)
     {
         // Grab the first byte
