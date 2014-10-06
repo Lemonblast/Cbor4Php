@@ -184,20 +184,33 @@ class Cbor {
         switch($additional)
         {
             case AdditionalType::UINT_8:
-                return array_shift($bytes);
+                $length = 1;
+                break;
 
             case AdditionalType::UINT_16:
-                return (array_shift($bytes) << 8) + (array_shift($bytes));
+                $length = 2;
+                break;
 
             case AdditionalType::UINT_32:
-                return (array_shift($bytes) << 16) + (array_shift($bytes) << 8) + (array_shift($bytes));
+                $length = 4;
+                break;
 
             case AdditionalType::UINT_64:
-                return (array_shift($bytes) << 24) + (array_shift($bytes) << 16) + (array_shift($bytes) << 8) + (array_shift($bytes));
+                $length = 8;
+                break;
 
             default:
                 return $additional;
         }
+
+        // Construct the value
+        $value = 0;
+        for($i = 0; $i < $length; $i++)
+        {
+            $value += array_shift($bytes) << ($i * 8);
+        }
+
+        return $value;
     }
 
     /**
