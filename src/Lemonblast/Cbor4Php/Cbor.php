@@ -79,24 +79,29 @@ class Cbor {
      * Decodes the supplied CBOR string.
      *
      * @param string $encoded Data to decode.
-     * @throws CborException If the input string is invalid.
+     * @param null $bytes An array of bytes (from another decode method).
+     * @throws CborException If the major type makes no sense.
      */
-    public static function decode($encoded)
+    public static function decode($encoded, &$bytes = null)
     {
         // Trying to decode null, eh?
-        if (is_null($encoded) || empty($encoded))
+        if ((is_null($encoded) || empty($encoded)) && is_null($bytes))
         {
             return null;
         }
 
-        // Unpack into array of characters
-        $chars = str_split($encoded);
-
-        // Convert the character array to an array of bytes
-        $bytes = array();
-        foreach ($chars as $char)
+        // Decoding a string
+        if (is_null($bytes))
         {
-            $bytes[] = ord($char);
+            // Unpack into array of characters
+            $chars = str_split($encoded);
+
+            // Convert the character array to an array of bytes
+            $bytes = array();
+            foreach ($chars as $char)
+            {
+                $bytes[] = ord($char);
+            }
         }
 
         // Grab the first byte
