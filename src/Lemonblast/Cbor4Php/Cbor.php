@@ -141,7 +141,7 @@ class Cbor {
             case MajorType::SIMPLE_AND_FLOAT:
 
             default:
-                throw new CborException("$encoded isn't a valid CBOR string.");
+                throw new CborException("$major isn't a valid CBOR Major Type.");
         }
     }
 
