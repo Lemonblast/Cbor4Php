@@ -89,10 +89,17 @@ class Cbor {
             return null;
         }
 
-        // Unpack into array of bytes
-        $bytes = unpack(PackFormat::UINT_8, $encoded);
+        // Unpack into array of characters
+        $chars = str_split($encoded);
 
-        // Grab the first character
+        // Convert the character array to an array of bytes
+        $bytes = array();
+        foreach($chars as $char)
+        {
+            $bytes[] = ord($char);
+        }
+
+        // Grab the first byte
         $first = array_shift($bytes);
 
         // Get the major type
