@@ -79,8 +79,7 @@ class Cbor {
      * Decodes the supplied CBOR string.
      *
      * @param string $encoded Data to decode.
-     * @param null $bytes An array of bytes (from another decode method).
-     * @throws CborException If the major type makes no sense.
+     * @return mixed Decoded result.
      */
     public static function decode($encoded)
     {
