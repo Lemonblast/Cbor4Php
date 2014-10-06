@@ -83,17 +83,17 @@ class Cbor {
      */
     public static function decode($encoded)
     {
-        // Copy the value to an intermediate variable
-        $val = $encoded;
-
         // Trying to decode null, eh?
-        if($val == null)
+        if(is_null($encoded) || empty($encoded))
         {
             return null;
         }
 
+        // Unpack into array of bytes
+        $bytes = unpack(PackFormat::UINT_8, $encoded);
+
         // Grab the first character
-        $first = array_shift($val);
+        $first = array_shift($bytes);
 
         // Get the major type
         $major = $first & MajorType::BIT_MASK;
@@ -101,8 +101,16 @@ class Cbor {
         switch($major)
         {
             case MajorType::POSITIVE_INT:
+                return self::decodeIntegerValue($first, $bytes);
 
             case MajorType::NEGATIVE_INT:
+                $decoded = self::decodeIntegerValue($first, $bytes);
+
+                // Apply negative number logic
+                $decoded += 1;
+                $decoded *= -1;
+
+                return $decoded;
 
             case MajorType::BYTE_STRING:
 
