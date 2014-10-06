@@ -79,10 +79,44 @@ class Cbor {
      * Decodes the supplied CBOR string.
      *
      * @param string $encoded Data to decode.
+     * @throws CborException If the input string is invalid.
      */
     public static function decode($encoded)
     {
-        return null;
+        // Copy the value to an intermediate variable
+        $val = $encoded;
+
+        // Trying to decode null, eh?
+        if($val == null)
+        {
+            return null;
+        }
+
+        // Grab the first character
+        $first = array_shift($val);
+
+        // Get the major type
+        $major = $first & MajorType::BIT_MASK;
+
+        switch($major)
+        {
+            case MajorType::POSITIVE_INT:
+
+            case MajorType::NEGATIVE_INT:
+
+            case MajorType::BYTE_STRING:
+
+            case MajorType::UTF8_STRING:
+
+            case MajorType::SEQUENCE:
+
+            case MajorType::MAP:
+
+            case MajorType::SIMPLE_AND_FLOAT:
+
+            default:
+                throw new CborException("$encoded isn't a valid CBOR string.");
+        }
     }
 
     /**
