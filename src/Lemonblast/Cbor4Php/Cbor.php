@@ -322,7 +322,7 @@ class Cbor {
             // Get the components of the double
             $sign = ($msb >> 7) & 0b1;                  // Sign is the first bit
             $exponent = ($msb >> 2) & 0b11111;          // Next 5 are the exponent
-            $significand = $lsb + (($msb & 0b11) << 8); // Final 10 are the significand
+            $significand = $lsb | (($msb & 0b11) << 8); // Final 10 are the significand
 
             // Do the math
             if ($exponent == 0)
