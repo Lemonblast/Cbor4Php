@@ -571,9 +571,13 @@ class Cbor {
                 return null;
 
             case AdditionalType::FLOAT_16:
+                return self::decodeDouble(2, $bytes);
+
             case AdditionalType::FLOAT_32:
+                return self::decodeDouble(4, $bytes);
+
             case AdditionalType::FLOAT_64:
-                return self::decodeDouble($additional, $bytes);
+                return self::decodeDouble(8, $bytes);
 
             default:
                 throw new CborException("$additional isn't a valid CBOR Additional Type for the Simple Major Type.");
