@@ -103,6 +103,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(pack('C', 0b11110101), $encoded);
     }
 
+    function testDecodeBoolTrue()
+    {
+        $decoded = Cbor::decode(pack('C', 0b11110101));
+
+        $this->assertEquals(true, $decoded);
+    }
+
     function testEncodeBoolFalse()
     {
         $encoded = Cbor::encode(false);
@@ -110,11 +117,25 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(pack('C', 0b11110100), $encoded);
     }
 
+    function testDecodeBoolFalse()
+    {
+        $decoded = Cbor::decode(pack('C', 0b11110100));
+
+        $this->assertEquals(false, $decoded);
+    }
+
     function testEncodeNull()
     {
         $encoded = Cbor::encode(null);
 
         $this->assertEquals(pack('C', 0b11110110), $encoded);
+    }
+
+    function testDecodeNull()
+    {
+        $decoded = Cbor::decode(pack('C', 0b11110110));
+
+        $this->assertEquals(null, $decoded);
     }
 
     function testEncodeUnknown()
@@ -126,6 +147,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $encoded = Cbor::encode($sock);
 
         $this->assertEquals(pack('C', 0b11110111), $encoded);
+    }
+
+    function testDecodeUnknown()
+    {
+        $decoded = Cbor::decode(pack('C', 0b11110111));
+
+        $this->assertEquals(null, $decoded);
     }
 
     function testStringEncodeEmpty()
