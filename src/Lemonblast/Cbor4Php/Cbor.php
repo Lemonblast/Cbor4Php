@@ -331,7 +331,17 @@ class Cbor {
      */
     private static function decodeString($additional, &$bytes)
     {
-        return "";
+        $length = self::decodeIntValue($additional, $bytes);
+
+        self::checkByteArrayLength($bytes, $length);
+
+        $string = "";
+        for ($i = 0; $i < $length; $i++)
+        {
+            $string .= chr(array_shift($bytes));
+        }
+
+        return $string;
     }
 
     /**
