@@ -115,14 +115,15 @@ class Cbor {
 
         // Get the major type
         $major = $first & MajorType::BIT_MASK;
+        $additional = $first & AdditionalType::BIT_MASK;
 
         switch($major)
         {
             case MajorType::POSITIVE_INT:
-                return self::decodeIntValue($first, $bytes);
+                return self::decodeIntValue($additional, $bytes);
 
             case MajorType::NEGATIVE_INT:
-                $decoded = self::decodeIntValue($first, $bytes);
+                $decoded = self::decodeIntValue($additional, $bytes);
 
                 // Apply negative number logic
                 $decoded += 1;
@@ -131,22 +132,22 @@ class Cbor {
                 return $decoded;
 
             case MajorType::BYTE_STRING:
-                return self::decodeByteString($first, $bytes);
+                return self::decodeByteString($additional, $bytes);
 
             case MajorType::UTF8_STRING:
-                return self::decodeString($first, $bytes);
+                return self::decodeString($additional, $bytes);
 
             case MajorType::SEQUENCE:
-                return self::decodeSequence($first, $bytes);
+                return self::decodeSequence($additional, $bytes);
 
             case MajorType::MAP:
-                return self::decodeMap($first, $bytes);
+                return self::decodeMap($additional, $bytes);
 
             case MajorType::SIMPLE_AND_FLOAT:
-                return self::decodeSimple($first, $bytes);
+                return self::decodeSimple($additional, $bytes);
 
             case MajorType::TAG:
-                return self::decodeTag($first, $bytes);
+                return self::decodeTag($additional, $bytes);
 
             default:
                 throw new CborException("$major isn't a valid CBOR Major Type.");
@@ -188,16 +189,13 @@ class Cbor {
     /**
      * Decodes an integer value, based on the first byte and additional data.
      *
-     * @param int $first First byte.
+     * @param int $additional Additional type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return int Decoded integer.
      */
-    private static function decodeIntValue($first, &$bytes)
+    private static function decodeIntValue($additional, &$bytes)
     {
-        // Grab additional type from first byte
-        $additional = $first & AdditionalType::BIT_MASK;
-
         switch($additional)
         {
             case AdditionalType::UINT_8:
@@ -331,12 +329,12 @@ class Cbor {
     /**
      * Decodes a CBOR UTF-8 string, based on the first byte and additional data.
      *
-     * @param int $first First byte.
+     * @param int $additional Additional type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return string UTF-8 encoded string.
      */
-    private static function decodeString($first, &$bytes)
+    private static function decodeString($additional, &$bytes)
     {
         return "";
     }
@@ -372,12 +370,12 @@ class Cbor {
     /**
      * Decodes a CBOR sequence, based on the first byte and additional data.
      *
-     * @param int $first First byte.
+     * @param int $additional Additional type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return array List of decoded  values.
      */
-    private static function decodeSequence($first, &$bytes)
+    private static function decodeSequence($additional, &$bytes)
     {
         return array();
     }
@@ -414,12 +412,12 @@ class Cbor {
     /**
      * Decodes a CBOR map, based on the first byte and additional data.
      *
-     * @param int $first First byte.
+     * @param int $additional Additional type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return array Map of decoded values.
      */
-    private static function decodeMap($first, &$bytes)
+    private static function decodeMap($additional, &$bytes)
     {
         return array();
     }
@@ -447,12 +445,12 @@ class Cbor {
     /**
      * Decodes a CBOR tag, based on the first byte and additional data.
      *
-     * @param int $first First byte.
+     * @param int $additional Additional type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return mixed Returns the CBOR value that the tag applies to.
      */
-    private static function decodeTag($first, &$bytes)
+    private static function decodeTag($additional, &$bytes)
     {
         return null;
     }
@@ -460,12 +458,12 @@ class Cbor {
     /**
      * Decodes a CBOR byte string, based on the first byte and additional data.
      *
-     * @param int $first First byte.
+     * @param int $additional Additional type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return array Byte string.
      */
-    private static function decodeByteString($first, &$bytes)
+    private static function decodeByteString($additional, &$bytes)
     {
         return null;
     }
@@ -473,12 +471,12 @@ class Cbor {
     /**
      * Decodes a CBOR simple type, based on the first byte and additional data.
      *
-     * @param int $first First byte.
+     * @param int $addition Addition type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return mixed Decoded simple type.
      */
-    private static function decodeSimple($first, &$bytes)
+    private static function decodeSimple($additional, &$bytes)
     {
         return null;
     }
