@@ -275,10 +275,10 @@ class Cbor {
     /**
      * Decodes a double value.
      *
-     * @param $length
-     * @param $bytes
+     * @param int $length Size of the number, in bytes.
+     * @param array $bytes The messages byte array.
      * @return float The decoded double.
-     * @throws CborException
+     * @throws CborException If there aren't enough bytes in the remaining byte string.
      */
     private static function decodeDouble($length, &$bytes)
     {
