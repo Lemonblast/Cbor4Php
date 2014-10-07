@@ -473,7 +473,16 @@ class Cbor {
      */
     private static function decodeByteString($additional, &$bytes)
     {
-        return null;
+        $length = self::decodeIntValue($additional, $bytes);
+        self::checkByteArrayLength($bytes, $length);
+
+        $array = array();
+        for ($i = 0; $i < $length; $i++)
+        {
+            array_push($array, array_shift($bytes));
+        }
+
+        return $array;
     }
 
     /**
