@@ -291,15 +291,12 @@ class Cbor {
         // Grab the required number of bytes
         $double_bytes = array_splice($bytes, 0, $length);
 
-        // Convert them to a string
+        // Convert them to a string, in reverse order
         $string = '';
-        foreach ($double_bytes as $byte)
+        foreach (array_reverse($double_bytes) as $byte)
         {
             $string .= chr($byte);
         }
-
-        // Reverse the string
-        $string = strrev($string);
 
         // Unpack a 32 bit double
         if ($length == 4)
@@ -315,13 +312,32 @@ class Cbor {
             return array_shift($doubles);
         }
 
+        // Unpack a 16 bit double
         else
         {
-            // Decode a 16 bit double...
-            return 0;
+            // Grab both bytes
+            $msb = array_shift($double_bytes);
+            $lsb = array_shift($double_bytes);
+
+            // Get the components of the double
+            $sign = ($msb >> 7) & 0b1;                  // Sign is the first bit
+            $exponent = ($msb >> 2) & 0b11111;          // Next 5 are the exponent
+            $significand = $lsb + (($msb & 0b11) << 8); // Final 10 are the significand
+
+            // Do the math
+            if ($exponent == 0)
+            {
+                $significand = '0.' . $significand;
+                $double = pow(-1, $sign) * pow(2, -14) * floatval($significand);
+            }
+            else
+            {
+                $significand = '1.' . $significand;
+                $double = pow(-1, $sign) * pow(2, $exponent - 15) * floatval($significand);
+            }
+
+            return $double;
         }
-
-
     }
 
     /**
