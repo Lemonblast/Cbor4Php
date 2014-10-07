@@ -218,18 +218,13 @@ class Cbor {
                 return $additional;
         }
 
+        self::checkByteArrayLength($bytes, $length);
+
         // Construct the value
         $value = 0;
         for ($i = $length-1; $i >= 0; $i--)
         {
-            $byte = array_shift($bytes);
-
-            if (is_null($byte))
-            {
-                throw new CborException("The supplied byte string isn't long enough to hold an int $length bytes long.");
-            }
-
-            $value += $byte << ($i * 8);
+            $value += array_shift($bytes) << ($i * 8);
         }
 
         return $value;
