@@ -311,7 +311,7 @@ class Cbor {
         // Unpack a 64 bit double
         else if ($length == 8)
         {
-            $doubles = unpack(PackFormat::FLOAT_64, $double_bytes);
+            $doubles = unpack(PackFormat::FLOAT_64, $string);
             return array_shift($doubles);
         }
 
