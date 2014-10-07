@@ -273,6 +273,46 @@ class Cbor {
     }
 
     /**
+     * Decodes a double value.
+     *
+     * @param $length
+     * @param $bytes
+     * @return float The decoded double.
+     * @throws CborException
+     */
+    private static function decodeDouble($length, &$bytes)
+    {
+        // Not enough bytes
+        if ($length > count($bytes))
+        {
+            throw new CborException("The supplied byte string is too short to decode the specified double type.");
+        }
+
+        // Grab the required number of bytes
+        $double_bytes = array_splice($bytes, 0, $length);
+
+        // Unpack a 32 bit double
+        if ($length == 4)
+        {
+            return unpack(PackFormat::FLOAT_32, $double_bytes);
+        }
+
+        // Unpack a 64 bit double
+        else if ($length == 8)
+        {
+            return unpack(PackFormat::FLOAT_64, $double_bytes);
+        }
+
+        else
+        {
+            // Decode a 16 bit double...
+            return 0;
+        }
+
+
+    }
+
+    /**
      * Encodes a boolean value.
      *
      * @param boolean $bool The boolean to encode.
