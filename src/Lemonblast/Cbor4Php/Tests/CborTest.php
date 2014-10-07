@@ -212,6 +212,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(pack('CCCC', 0b10000011, 0b00000001, 0b00000010, 0b00000011), $encoded);
     }
 
+    function testDecodeIntSequence()
+    {
+        $decoded = Cbor::decode(pack('CCCC', 0b10000011, 0b00000001, 0b00000010, 0b00000011));
+
+        $this->assertEquals(array(1,2,3), $decoded);
+    }
+
     function testEncodeIntMap()
     {
         $encoded = Cbor::encode(array(1 => 1, 2 => 2, 3 => 3));
