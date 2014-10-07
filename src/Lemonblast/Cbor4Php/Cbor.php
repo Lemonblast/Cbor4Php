@@ -291,16 +291,28 @@ class Cbor {
         // Grab the required number of bytes
         $double_bytes = array_splice($bytes, 0, $length);
 
+        // Convert them to a string
+        $string = '';
+        foreach ($double_bytes as $byte)
+        {
+            $string .= chr($byte);
+        }
+
+        // Reverse the string
+        $string = strrev($string);
+
         // Unpack a 32 bit double
         if ($length == 4)
         {
-            return unpack(PackFormat::FLOAT_32, $double_bytes);
+            $doubles = unpack(PackFormat::FLOAT_32, $string);
+            return array_shift($doubles);
         }
 
         // Unpack a 64 bit double
         else if ($length == 8)
         {
-            return unpack(PackFormat::FLOAT_64, $double_bytes);
+            $doubles = unpack(PackFormat::FLOAT_64, $double_bytes);
+            return array_shift($doubles);
         }
 
         else
