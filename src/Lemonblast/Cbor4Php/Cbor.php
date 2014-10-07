@@ -483,7 +483,31 @@ class Cbor {
      */
     private static function decodeSimple($additional, &$bytes)
     {
-        return null;
+        switch($additional)
+        {
+            case AdditionalType::SIMPLE_FALSE:
+                return false;
+
+            case AdditionalType::SIMPLE_TRUE:
+                return true;
+
+            case AdditionalType::SIMPLE_UNDEFINED: // Deliberate fall-through
+            case AdditionalType::SIMPLE_NULL:
+                return null;
+
+            // TODO: Fill in decoding of decimal types
+            case AdditionalType::FLOAT_16:
+                return 0;
+
+            case AdditionalType::FLOAT_32:
+                return 0;
+
+            case AdditionalType::FLOAT_64:
+                return 0;
+
+            default:
+                throw new CborException("$additional isn't a valid CBOR Additional Type for the Simple Major Type.");
+        }
     }
 
     /**
