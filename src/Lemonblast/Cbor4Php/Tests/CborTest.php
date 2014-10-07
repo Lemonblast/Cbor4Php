@@ -140,7 +140,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testEncodeUnknown()
     {
-        // Open and close a resource, only way to get an unknown type in PHP.
+        // Open and close a resource (easy way to get an unknown type in PHP)
         $sock = socket_create(AF_INET, SOCK_STREAM, 0);
         socket_close($sock);
 
