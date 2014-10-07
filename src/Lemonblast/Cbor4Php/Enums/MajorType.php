@@ -15,7 +15,7 @@ abstract class MajorType {
     const UTF8_STRING = 0b1100000;
     const SEQUENCE = 0b10000000;
     const MAP = 0b10100000;
-    const TAGS = 0b11000000;
+    const TAG = 0b11000000;
     const SIMPLE_AND_FLOAT = 0b11100000;
 }
 
