@@ -511,7 +511,7 @@ class Cbor {
     /**
      * Decodes a CBOR simple type, based on the first byte and additional data.
      *
-     * @param int $addition Addition type.
+     * @param int $additional Addition type.
      * @param array $bytes Remaining bytes in string.
      * @throws CborException If the byte array is not long enough for the specified type of integer.
      * @return mixed Decoded simple type.
@@ -530,15 +530,10 @@ class Cbor {
             case AdditionalType::SIMPLE_NULL:
                 return null;
 
-            // TODO: Fill in decoding of decimal types
             case AdditionalType::FLOAT_16:
-                return 0;
-
             case AdditionalType::FLOAT_32:
-                return 0;
-
             case AdditionalType::FLOAT_64:
-                return 0;
+                return self::decodeDouble($additional, $bytes);
 
             default:
                 throw new CborException("$additional isn't a valid CBOR Additional Type for the Simple Major Type.");
