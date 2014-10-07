@@ -493,6 +493,21 @@ class Cbor {
         $first_byte = ($major & MajorType::BIT_MASK) | ($additional & AdditionalType::BIT_MASK);
         return pack(PackFormat::UINT_8, $first_byte);
     }
+
+    /**
+     * Check to see if the byte array is large enough for the number of values requested
+     *
+     * @param array $bytes An array of bytes.
+     * @param int $length The number of bytes required.
+     * @throws CborException If the byte array is too short.
+     */
+    private static function checkByteArrayLength(&$bytes, $length)
+    {
+        if ($length > count($bytes))
+        {
+            throw new CborException("CBOR byte stream abruptly ended.");
+        }
+    }
 }
 
 ?>
