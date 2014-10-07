@@ -427,12 +427,27 @@ class Cbor {
      *
      * @param int $additional Additional type.
      * @param array $bytes Remaining bytes in string.
-     * @throws CborException If the byte array is not long enough for the specified type of integer.
+     * @throws CborException If keys in map are overwritten.
      * @return array Map of decoded values.
      */
     private static function decodeMap($additional, &$bytes)
     {
-        return array();
+        $length = self::decodeIntValue($additional, $bytes);
+
+        $map = array();
+        for ($i = 0; $i < $length; $i++)
+        {
+            $key = self::recursiveDecode($bytes);
+            if (array_key_exists($key, $map))
+            {
+                throw new CborException("Map contains multiple keys with same value.");
+            }
+
+            $value = self::recursiveDecode($bytes);
+            $map[$key] = $value;
+        }
+
+        return $map;
     }
 
     /**
