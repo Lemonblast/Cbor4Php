@@ -382,7 +382,15 @@ class Cbor {
      */
     private static function decodeSequence($additional, &$bytes)
     {
-        return array();
+        $length = self::decodeIntValue($additional, $bytes);
+
+        $sequence = array();
+        for ($i = 0; $i < $length; $i++)
+        {
+            array_push($sequence, self::recursiveDecode($bytes));
+        }
+
+        return $sequence;
     }
 
     /**
