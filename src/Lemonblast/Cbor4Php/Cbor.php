@@ -324,16 +324,24 @@ class Cbor {
             $exponent = ($msb >> 2) & 0b11111;          // Next 5 are the exponent
             $significand = $lsb | (($msb & 0b11) << 8); // Final 10 are the significand
 
+            // Convert the significand to a float
+            $decimal = 0;
+            for ($i = 9; $i >= 0; $i--)
+            {
+                if (($significand >> ($i)) & 0b1)
+                {
+                    $decimal += pow(2, -1 * (10 - $i));
+                }
+            }
+
             // Do the math
             if ($exponent == 0)
             {
-                $significand = '0.' . $significand;
-                $double = pow(-1, $sign) * pow(2, -14) * floatval($significand);
+                $double = pow(-1, $sign) * pow(2, -14) * $decimal;
             }
             else
             {
-                $significand = '1.' . $significand;
-                $double = pow(-1, $sign) * pow(2, $exponent - 15) * floatval($significand);
+                $double = pow(-1, $sign) * pow(2, $exponent - 15) * (1 + $decimal);
             }
 
             return $double;
