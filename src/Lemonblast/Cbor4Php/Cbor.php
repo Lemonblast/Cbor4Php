@@ -260,6 +260,8 @@ class Cbor {
      */
     private static function encodeDouble($double)
     {
+        // TODO: Encode with the smallest possible format
+
         $major = MajorType::SIMPLE_AND_FLOAT;
 
         // If the encode doubles in 64 bit flag is set
