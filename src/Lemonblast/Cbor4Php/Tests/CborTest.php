@@ -235,9 +235,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testDecodeFloat_16()
     {
-        $decoded = Cbor::decode(pack('CCC',0xf9, 0b00110101, 0b01010101));
+        $decoded1 = Cbor::decode(pack('CCC',0xf9, 0x24, 0x00));
+        $decoded2 = Cbor::decode(pack('CCC',0xf9, 0x3e, 0x00));
+        $decoded3 = Cbor::decode(pack('CCC',0xf9, 0x38, 0x00));
 
-        $this->assertEquals(0.33525, $decoded);
+        $this->assertEquals(0.015625, $decoded1);
+        $this->assertEquals(1.5, $decoded2);
+        $this->assertEquals(0.5, $decoded3);
     }
 
     function testEncodeDouble_32()
