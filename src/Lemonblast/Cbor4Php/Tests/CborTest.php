@@ -167,40 +167,40 @@ class CborTest extends \PHPUnit_Framework_TestCase
     {
         $encoded = Cbor::encode("a");
 
-        $this->assertEquals(pack('CC', 0b1100001, 97), $encoded);
+        $this->assertEquals(pack('C*', 0b1100001, 97), $encoded);
     }
 
     function testStringEncodeLowerAlphabet()
     {
         $encoded = Cbor::encode("abcdefghijklmnopqrstuvwxyz");
 
-        $this->assertEquals(pack('CCCCCCCCCCCCCCCCCCCCCCCCCCCC', 0b01111000, 0b11010, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122), $encoded);
+        $this->assertEquals(pack('C*', 0b01111000, 0b11010, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122), $encoded);
     }
 
     function testStringEncodeUpperAlphabet()
     {
         $encoded = Cbor::encode("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-        $this->assertEquals(pack('CCCCCCCCCCCCCCCCCCCCCCCCCCCC', 0b01111000, 0b11010, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90), $encoded);
+        $this->assertEquals(pack('C*', 0b01111000, 0b11010, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90), $encoded);
     }
 
     function testStringDecodeCharacter()
     {
-        $decoded = Cbor::decode(pack('CC', 0b1100001, 97));
+        $decoded = Cbor::decode(pack('C*', 0b1100001, 97));
 
         $this->assertEquals("a", $decoded);
     }
 
     function testStringDecodeLowerAlphabet()
     {
-        $decoded = Cbor::decode(pack('CCCCCCCCCCCCCCCCCCCCCCCCCCCC', 0b01111000, 0b11010, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122));
+        $decoded = Cbor::decode(pack('C*', 0b01111000, 0b11010, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122));
 
         $this->assertEquals("abcdefghijklmnopqrstuvwxyz", $decoded);
     }
 
     function testStringDecodeUpperAlphabet()
     {
-        $decoded = Cbor::decode(pack('CCCCCCCCCCCCCCCCCCCCCCCCCCCC', 0b01111000, 0b11010, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90));
+        $decoded = Cbor::decode(pack('C*', 0b01111000, 0b11010, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90));
 
         $this->assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", $decoded);
     }
@@ -209,12 +209,12 @@ class CborTest extends \PHPUnit_Framework_TestCase
     {
         $encoded = Cbor::encode(array(1,2,3));
 
-        $this->assertEquals(pack('CCCC', 0b10000011, 0b00000001, 0b00000010, 0b00000011), $encoded);
+        $this->assertEquals(pack('C*', 0b10000011, 0b00000001, 0b00000010, 0b00000011), $encoded);
     }
 
     function testDecodeIntSequence()
     {
-        $decoded = Cbor::decode(pack('CCCC', 0b10000011, 0b00000001, 0b00000010, 0b00000011));
+        $decoded = Cbor::decode(pack('C*', 0b10000011, 0b00000001, 0b00000010, 0b00000011));
 
         $this->assertEquals(array(1,2,3), $decoded);
     }
@@ -223,21 +223,21 @@ class CborTest extends \PHPUnit_Framework_TestCase
     {
         $encoded = Cbor::encode(array(1 => 1, 2 => 2, 3 => 3));
 
-        $this->assertEquals(pack('CCCCCCC', 0b10100011, 0b00000001, 0b00000001, 0b00000010, 0b00000010, 0b00000011, 0b00000011), $encoded);
+        $this->assertEquals(pack('C*', 0b10100011, 0b00000001, 0b00000001, 0b00000010, 0b00000010, 0b00000011, 0b00000011), $encoded);
     }
 
     function testDecodeIntMap()
     {
-        $decoded = Cbor::decode(pack('CCCCCCC', 0b10100011, 0b00000001, 0b00000001, 0b00000010, 0b00000010, 0b00000011, 0b00000011));
+        $decoded = Cbor::decode(pack('C*', 0b10100011, 0b00000001, 0b00000001, 0b00000010, 0b00000010, 0b00000011, 0b00000011));
 
         $this->assertEquals(array(1 => 1, 2 => 2, 3 => 3), $decoded);
     }
 
     function testDecodeFloat_16()
     {
-        $decoded1 = Cbor::decode(pack('CCC',0xf9, 0x24, 0x00));
-        $decoded2 = Cbor::decode(pack('CCC',0xf9, 0x3e, 0x00));
-        $decoded3 = Cbor::decode(pack('CCC',0xf9, 0x38, 0x00));
+        $decoded1 = Cbor::decode(pack('C*',0xf9, 0x24, 0x00));
+        $decoded2 = Cbor::decode(pack('C*',0xf9, 0x3e, 0x00));
+        $decoded3 = Cbor::decode(pack('C*',0xf9, 0x38, 0x00));
 
         $this->assertEquals(0.015625, $decoded1);
         $this->assertEquals(1.5, $decoded2);
@@ -253,7 +253,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testDecodeDouble_32()
     {
-        $decoded = Cbor::decode(pack('CCCCC', 0xfa, 0x3f, 0xc0, 0x00, 0x00));
+        $decoded = Cbor::decode(pack('C*', 0xfa, 0x3f, 0xc0, 0x00, 0x00));
 
         $this->assertEquals(1.5, $decoded);
     }
@@ -267,14 +267,14 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testDecodeDouble_64()
     {
-        $decoded = Cbor::decode(pack('CCCCCCCCC', 0xfb, 0x3f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00,0x00));
+        $decoded = Cbor::decode(pack('C*', 0xfb, 0x3f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00,0x00));
 
         $this->assertEquals(1.5, $decoded);
     }
 
     function testDecodeByteString()
     {
-        $decoded = Cbor::decode(pack('CC', 0b01000001, 0xff));
+        $decoded = Cbor::decode(pack('C*', 0b01000001, 0xff));
 
         $this->assertEquals(array(0xff), $decoded);
     }
