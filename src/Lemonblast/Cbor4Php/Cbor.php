@@ -264,14 +264,41 @@ class Cbor {
 
         $major = MajorType::SIMPLE_AND_FLOAT;
 
-        // If the encode doubles in 64 bit flag is set
-        if(self::$ENCODE_DOUBLE_64_BIT)
+        // Get a byte string as a 64 bit double for maximum accuracy
+        $string = pack(PackFormat::FLOAT_64, $double);
+
+        // Convert to byte array
+        $bytes = unpack("C*", $string);
+
+        // Reverse it, you want MSB first
+        $bytes = array_reverse($bytes);
+
+        // Get parameters
+        $sign = ($bytes[0] >> 7) & 0b1;                  // Sign is the first bit
+        $exponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4)) - 1023;          // Next 11 are the exponent
+        $significand = ($bytes[1] & 0b1111) << 48;
+        for ($i = 2; $i < 8; $i++)
+        {
+            $significand += ($bytes[$i] << (7 - $i));
+        }
+
+        // 16 bit double
+        if($exponent <= 15 && $exponent >= -14 && $significand <= 1023)
+        {
+            // 16 bit double
+        }
+
+        // 32 bit double
+        else if($exponent <= 127 && $exponent >= -126 && $significand <= 8388608)
+        {
+            return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . strrev(pack(PackFormat::FLOAT_32, $double));
+        }
+
+        // 64 bit double
+        else
         {
             return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . strrev(pack(PackFormat::FLOAT_64, $double));
         }
-
-        // Default to 32 bit (16 is not supported by PHP)
-        return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . strrev(pack(PackFormat::FLOAT_32, $double));
     }
 
     /**
