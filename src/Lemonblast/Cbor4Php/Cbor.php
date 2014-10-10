@@ -282,7 +282,7 @@ class Cbor {
         }
 
         // 16 bit double
-        if ($exponent <= 15 && $exponent >= -14 && self::significandFits($significand, 10))
+        if (self::exponentFits($exponent, 5) && self::significandFits($significand, 10))
         {
             // Shrink the significand down to the right number of bits
             $significand = self::significandShrink($significand, 10);
@@ -310,7 +310,7 @@ class Cbor {
         }
 
         // 32 bit double
-        else if ($exponent <= 127 && $exponent >= -126 && self::significandFits($significand, 23))
+        else if (self::exponentFits($exponent, 8) && self::significandFits($significand, 23))
         {
             return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . strrev(pack(PackFormat::FLOAT_32, $double));
         }
