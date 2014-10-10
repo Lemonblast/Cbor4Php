@@ -699,7 +699,7 @@ class Cbor {
     }
 
     /**
-     * Determines if a number "fits" in $num_bits bits.
+     * Determines if a significand "fits" in $num_bits bits.
      *
      * @param int $significand The significand to check.
      * @param int $num_bits The number of bits to check fit for.
