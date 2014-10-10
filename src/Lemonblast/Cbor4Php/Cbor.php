@@ -727,9 +727,9 @@ class Cbor {
     /**
      * Shrinks the significand to the required number of bits.
      *
-     * @param $significand
-     * @param $num_bits
-     * @return int
+     * @param int $significand Significand to shrink.
+     * @param int $num_bits Number of bits to shrink it to.
+     * @return int The shrunken significand.
      */
     private static function significandShrink($significand, $num_bits)
     {
