@@ -103,7 +103,7 @@ class Cbor {
 
         if (!empty($bytes))
         {
-            throw new CborException("There are too many bytes in the bit stream for the specified decoding.");
+            throw new CborException("There are more bytes than expected in the CBOR byte array.");
         }
 
         return $val;
