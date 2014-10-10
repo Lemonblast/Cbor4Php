@@ -70,6 +70,7 @@ class Cbor {
      * Decodes the supplied CBOR string.
      *
      * @param string $encoded Data to decode.
+     * @throws CborException If there are bytes left over after decoding.
      * @return mixed Decoded result.
      */
     public static function decode($encoded)
@@ -90,7 +91,14 @@ class Cbor {
             $bytes[] = ord($char);
         }
 
-        return self::recursiveDecode($bytes);
+        $val = self::recursiveDecode($bytes);
+
+        if (!empty($bytes))
+        {
+            throw new CborException("There are too many bytes in the bit stream for the specified decoding.");
+        }
+
+        return $val;
     }
 
     /**
