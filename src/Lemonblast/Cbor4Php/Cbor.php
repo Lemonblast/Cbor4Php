@@ -272,10 +272,10 @@ class Cbor {
         $bytes = array_reverse($bytes);
 
         // Get parameters
-        $sign = ($bytes[0] >> 7) & 0b1;                  // Sign is the first bit
-        $exponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4)) - 1023;          // Next 11 are the exponent
+        $sign = ($bytes[0] >> 7) & 0b1;                                             // Sign is the first bit
+        $exponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4)) - 1023;   // Next 11 are the exponent
 
-        // Make the significand
+        // Make the significand (Final 52 bits)
         $significand = ($bytes[1] & 0b1111) << 48;
         for ($i = 2; $i < 8; $i++)
         {
