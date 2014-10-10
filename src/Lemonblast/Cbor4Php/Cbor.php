@@ -270,7 +270,7 @@ class Cbor {
         $significand = ($bytes[1] & 0b1111) << 48;
         for ($i = 2; $i < 8; $i++)
         {
-            $significand += ($bytes[$i] << (7 - $i));
+            $significand += ($bytes[$i] << ((7 - $i) * 8));
         }
 
         // 16 bit double
