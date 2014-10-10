@@ -251,10 +251,12 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $decoded1 = Cbor::decode(pack('C*',0xf9, 0x24, 0x00));
         $decoded2 = Cbor::decode(pack('C*',0xf9, 0x3e, 0x00));
         $decoded3 = Cbor::decode(pack('C*',0xf9, 0x38, 0x00));
+        $decoded4 = Cbor::decode(pack('C*',0xf9, 0xb8, 0x00));
 
         $this->assertEquals(0.015625, $decoded1);
         $this->assertEquals(1.5, $decoded2);
         $this->assertEquals(0.5, $decoded3);
+        $this->assertEquals(-0.5, $decoded4);
     }
 
 //    function testEncodeDouble_32()
