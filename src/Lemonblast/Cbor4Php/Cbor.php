@@ -702,9 +702,9 @@ class Cbor {
     /**
      * Determines if a number "fits" in $num_bits bits.
      *
-     * @param $significand
-     * @param $num_bits
-     * @return bool
+     * @param int $significand The significand to check.
+     * @param int $num_bits The number of bits to check fit for.
+     * @return bool If the significand fits in the specified $bit_num.
      */
     private static function significandFits($significand, $num_bits)
     {
