@@ -727,20 +727,20 @@ class Cbor {
     /**
      * Shrinks the significand to the required number of bits.
      *
-     * @param $number
+     * @param $significand
      * @param $num_bits
      * @return int
      */
-    private static function significandShrink($number, $num_bits)
+    private static function significandShrink($significand, $num_bits)
     {
         $max = (pow(2, $num_bits) - 1);
 
-        while ($number > $max)
+        while ($significand > $max)
         {
-            $number = $number >> 1;
+            $significand = $significand >> 1;
         }
 
-        return $number;
+        return $significand;
     }
 }
 
