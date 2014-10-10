@@ -260,8 +260,6 @@ class Cbor {
      */
     private static function encodeDouble($double)
     {
-        // TODO: Encode with the smallest possible format
-
         $major = MajorType::SIMPLE_AND_FLOAT;
 
         // Get a byte string as a 64 bit double for maximum accuracy
@@ -276,6 +274,8 @@ class Cbor {
         // Get parameters
         $sign = ($bytes[0] >> 7) & 0b1;                  // Sign is the first bit
         $exponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4)) - 1023;          // Next 11 are the exponent
+
+        // Make the significand
         $significand = ($bytes[1] & 0b1111) << 48;
         for ($i = 2; $i < 8; $i++)
         {
@@ -283,13 +283,35 @@ class Cbor {
         }
 
         // 16 bit double
-        if($exponent <= 15 && $exponent >= -14 && $significand <= 1023)
+        if($exponent <= 15 && $exponent >= -14 && self::significandFits($significand, 10))
         {
-            // 16 bit double
+            // Shrink the significand down to the right number of bits
+            $significand = self::significandShrink($significand, 10);
+
+            // Make first byte
+            $first = self::encodeFirstByte($major, AdditionalType::FLOAT_16);
+
+            // Make the bit form exponent
+            if ($exponent == -14)
+            {
+                $exponent = 0;
+            }
+            else
+            {
+                $exponent = $exponent + 15;
+            }
+
+            // Make second byte
+            $second = (($sign << 7) & 0b10000000) | (($exponent << 2) & 0b01111100) | (($significand >> 8) & 0b11);
+
+            // And the third
+            $third = $significand & 255;
+
+            return $first . pack(PackFormat::UINT_8, $second) . pack(PackFormat::UINT_8, $third);
         }
 
         // 32 bit double
-        else if($exponent <= 127 && $exponent >= -126 && $significand <= 8388608)
+        else if($exponent <= 127 && $exponent >= -126 && self::significandFits($significand, 23))
         {
             return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . strrev(pack(PackFormat::FLOAT_32, $double));
         }
@@ -675,6 +697,50 @@ class Cbor {
         {
             throw new CborException("CBOR byte stream abruptly ended.");
         }
+    }
+
+    /**
+     * Determines if a number "fits" in $num_bits bits.
+     *
+     * @param $number
+     * @param $num_bits
+     * @return bool
+     */
+    private static function significandFits($number, $num_bits)
+    {
+        // If it's zero, it'll fit in any number of bits (Except zero)
+        if ($number == 0)
+        {
+            return true;
+        }
+
+        // Shift right until you lose information
+        while (!($number & 0b1))
+        {
+            $number = $number >> 1;
+        }
+
+        // Determine if the number is smaller than allowable
+        return $number <= (pow(2, $num_bits) - 1);
+    }
+
+    /**
+     * Shrinks the significand to the required number of bits.
+     *
+     * @param $number
+     * @param $num_bits
+     * @return int
+     */
+    private static function significandShrink($number, $num_bits)
+    {
+        $max = (pow(2, $num_bits) - 1);
+
+        while ($number > $max)
+        {
+            $number = $number >> 1;
+        }
+
+        return $number;
     }
 }
 
