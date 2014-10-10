@@ -745,6 +745,21 @@ class Cbor {
 
         return $significand;
     }
+
+    /**
+     * Determines if the given exponent fits into the given number of bits.
+     *
+     * @param int $exponent The exponent to check.
+     * @param int $num_bits The number of bits to check for fit.
+     * @return bool If the exponent fits in the specified number of bits.
+     */
+    private static function exponentFits($exponent, $num_bits)
+    {
+        $max = floor((pow(2, $num_bits) - 1) / 2);
+        $min = (-1 * $max) + 1;
+
+        return (($exponent >= $min) && ($exponent <= $max));
+    }
 }
 
 ?>
