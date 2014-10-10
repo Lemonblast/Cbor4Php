@@ -33,16 +33,7 @@ class Cbor {
                 return self::encodeInteger($decoded);
 
             case "double":
-                // Extremely large ints return "double" due to a bug, this makes sure it won't happen
-                if(floor($decoded) == $decoded)
-                {
-                    return self::encodeInteger($decoded);
-                }
-                // Otherwise, it's a float
-                else
-                {
-                    return self::encodeDouble($decoded);
-                }
+                return self::encodeDouble($decoded);
 
             case "boolean":
                 return self::encodeBoolean($decoded);
