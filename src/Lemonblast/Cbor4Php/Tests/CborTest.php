@@ -233,6 +233,19 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1 => 1, 2 => 2, 3 => 3), $decoded);
     }
 
+    function testEncodeFloat_16()
+    {
+        $encoded1 = Cbor::encode(0.015625);
+        $encoded2 = Cbor::encode(1.5);
+        $encoded3 = Cbor::encode(0.5);
+        $encoded4 = Cbor::encode(-0.5);
+
+        $this->assertEquals(pack('C*',0xf9, 0x24, 0x00), $encoded1);
+        $this->assertEquals(pack('C*',0xf9, 0x3e, 0x00), $encoded2);
+        $this->assertEquals(pack('C*',0xf9, 0x38, 0x00), $encoded3);
+        $this->assertEquals(pack('C*',0xf9, 0xb8, 0x00), $encoded4);
+    }
+
     function testDecodeFloat_16()
     {
         $decoded1 = Cbor::decode(pack('C*',0xf9, 0x24, 0x00));

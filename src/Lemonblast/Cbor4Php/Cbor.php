@@ -702,26 +702,26 @@ class Cbor {
     /**
      * Determines if a number "fits" in $num_bits bits.
      *
-     * @param $number
+     * @param $significand
      * @param $num_bits
      * @return bool
      */
-    private static function significandFits($number, $num_bits)
+    private static function significandFits($significand, $num_bits)
     {
         // If it's zero, it'll fit in any number of bits (Except zero)
-        if ($number == 0)
+        if ($significand == 0)
         {
             return true;
         }
 
         // Shift right until you lose information
-        while (!($number & 0b1))
+        while (!($significand & 0b1))
         {
-            $number = $number >> 1;
+            $significand = $significand >> 1;
         }
 
         // Determine if the number is smaller than allowable
-        return $number <= (pow(2, $num_bits) - 1);
+        return $significand <= (pow(2, $num_bits) - 1);
     }
 
     /**
