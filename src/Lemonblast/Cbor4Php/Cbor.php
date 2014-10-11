@@ -15,6 +15,16 @@ class Cbor {
 
     const STRING_ENCODING = "UTF-8";
 
+    const IEEE754_FLOAT_16_EXPONENT_LENGTH = 5;
+    const IEEE754_FLOAT_16_FRACTION_LENGTH = 10;
+    const IEEE754_FLOAT_16_MIN_EXPONENT = -14;
+    const IEEE754_FLOAT_16_MAX_EXPONENT = 15;
+
+    const IEEE754_FLOAT_32_EXPONENT_LENGTH = 8;
+    const IEEE754_FLOAT_32_FRACTION_LENGTH = 23;
+
+    const IEEE754_FLOAT_64_EXPONENET_OFFSET = 1023;
+
     /**
      * Encodes the supplied value into a CBOR string.
      *
