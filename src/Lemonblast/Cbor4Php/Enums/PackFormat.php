@@ -8,6 +8,7 @@
  */
 class PackFormat {
 
+    const UNIT_8_SET = "C*";
     const UINT_8 = "C";
     const UINT_16 = "n";
     const UINT_32 = "N";
