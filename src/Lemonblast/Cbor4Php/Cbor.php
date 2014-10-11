@@ -15,9 +15,6 @@ class Cbor {
 
     const STRING_ENCODING = "UTF-8";
 
-    // Public flag for 64 bit double encoding
-    public static $ENCODE_DOUBLE_64_BIT = false;
-
     /**
      * Encodes the supplied value into a CBOR string.
      *
