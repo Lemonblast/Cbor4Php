@@ -23,7 +23,8 @@ class Cbor {
     const IEEE754_FLOAT_32_EXPONENT_LENGTH = 8;
     const IEEE754_FLOAT_32_FRACTION_LENGTH = 23;
 
-    const IEEE754_FLOAT_64_EXPONENET_OFFSET = 1023;
+    const IEEE754_FLOAT_64_EXPONENT_OFFSET = 1023;
+    const IEEE754_FLOAT_64_FRACTION_LENGTH = 52;
 
     /**
      * Encodes the supplied value into a CBOR string.
@@ -272,39 +273,39 @@ class Cbor {
         $string = pack(PackFormat::FLOAT_64, $double);
 
         // Convert to byte array
-        $bytes = unpack("C*", $string);
+        $bytes = unpack(PackFormat::UNIT_8_SET, $string);
 
         // Reverse it, you want MSB first
         $bytes = array_reverse($bytes);
 
         // Get parameters
-        $sign = ($bytes[0] >> 7) & 0b1;                                             // Sign is the first bit
-        $exponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4)) - 1023;   // Next 11 are the exponent
+        $sign = ($bytes[0] >> 7) & 0b1;                                                                                 // Sign is the first bit
+        $exponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4)) - self::IEEE754_FLOAT_64_EXPONENT_OFFSET;    // Next 11 are the exponent
 
         // Make the significand (Final 52 bits)
-        $significand = ($bytes[1] & 0b1111) << 48;
+        $significand = ($bytes[1] & 0b1111) << (self::IEEE754_FLOAT_64_FRACTION_LENGTH - 4);
         for ($i = 2; $i < 8; $i++)
         {
             $significand += ($bytes[$i] << ((7 - $i) * 8));
         }
 
         // 16 bit double
-        if (self::exponentFits($exponent, 5) && self::significandFits($significand, 10))
+        if (self::exponentFits($exponent, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_16_FRACTION_LENGTH))
         {
             // Shrink the significand down to the right number of bits
-            $significand = self::significandShrink($significand, 10);
+            $significand = self::significandShrink($significand, self::IEEE754_FLOAT_16_FRACTION_LENGTH);
 
             // Make first byte
             $first = self::encodeFirstByte($major, AdditionalType::FLOAT_16);
 
             // Make the bit form exponent
-            if ($exponent == -14)
+            if ($exponent == self::IEEE754_FLOAT_16_MIN_EXPONENT)
             {
                 $exponent = 0;
             }
             else
             {
-                $exponent = $exponent + 15;
+                $exponent = $exponent + self::IEEE754_FLOAT_16_MAX_EXPONENT;
             }
 
             // Make second byte
@@ -317,7 +318,7 @@ class Cbor {
         }
 
         // 32 bit double
-        else if (self::exponentFits($exponent, 8) && self::significandFits($significand, 23))
+        else if (self::exponentFits($exponent, self::IEEE754_FLOAT_32_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_32_FRACTION_LENGTH))
         {
             return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . strrev(pack(PackFormat::FLOAT_32, $double));
         }
@@ -394,11 +395,11 @@ class Cbor {
             // Do the math
             if ($exponent == 0)
             {
-                $double = pow(-1, $sign) * pow(2, -14) * $decimal;
+                $double = pow(-1, $sign) * pow(2, self::IEEE754_FLOAT_16_MIN_EXPONENT) * $decimal;
             }
             else
             {
-                $double = pow(-1, $sign) * pow(2, $exponent - 15) * (1 + $decimal);
+                $double = pow(-1, $sign) * pow(2, $exponent - self::IEEE754_FLOAT_16_MAX_EXPONENT) * (1 + $decimal);
             }
 
             return $double;
