@@ -51,29 +51,31 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testEncodeUINT32()
     {
-        $encoded = Cbor::encode(4294967295);
+        // Max value in a 32 bit int (signed)
+        $encoded = Cbor::encode(2147483647);
 
-        // Should be a byte string of 26, 4294967295
-        $this->assertEquals(pack('C', 26) . pack('N', 4294967295), $encoded);
+        // Should be a byte string of 26, 2147483647
+        $this->assertEquals(pack('C', 26) . pack('N', 2147483647), $encoded);
     }
 
     function testDecodeUINT32()
     {
-        $decoded = Cbor::decode(pack('C', 26) . pack('N', 4294967295));
+        $decoded = Cbor::decode(pack('C', 26) . pack('N', 2147483647));
 
-        $this->assertEquals(4294967295, $decoded);
+        $this->assertEquals(2147483647, $decoded);
     }
 
-//    function testEncodeUINT64()
-//    {
-//        $encoded = Cbor::encode(18446744073709551615);
-//
-//        $first = 18446744073709551615 >> 32;
-//        $second = 18446744073709551615 & 0xffffffff;
-//
-//        // Should be a byte string of 27, 18446744073709551615
-//        $this->assertEquals(pack('C', 27) . pack('NN', $first, $second), $encoded);
-//    }
+    function testEncodeUINT64()
+    {
+        // Max value in a 64 bit int (signed)
+        $encoded = Cbor::encode(9223372036854775807);
+
+        $first = 9223372036854775807 >> 32;
+        $second = 9223372036854775807 & 0xffffffff;
+
+        // Should be a byte string of 27, 9223372036854775807
+        $this->assertEquals(pack('C', 27) . pack('NN', $first, $second), $encoded);
+    }
 
 //    function testEncodeSuperLargeInt()
 //    {

@@ -12,8 +12,6 @@ class Max {
     const UINT_16 = 65535;
     const UINT_32 = 4294967295;
     const UINT_64 = 18446744073709551615;
-
-    const INT = PHP_INT_MAX;
 }
 
 ?> 
