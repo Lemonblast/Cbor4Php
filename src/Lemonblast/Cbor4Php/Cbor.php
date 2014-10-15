@@ -768,6 +768,16 @@ class Cbor {
 
         return (($exponent >= $min) && ($exponent <= $max));
     }
+
+    /**
+     * Determines if the PHP install is big endian.
+     *
+     * @return bool True if big endian, false otherwise.
+     */
+    private static function isBigEndian()
+    {
+        return pack('L', 1) === pack('N', 1);
+    }
 }
 
 ?>
