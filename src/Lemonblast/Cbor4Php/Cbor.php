@@ -113,6 +113,7 @@ class Cbor {
      * Does a decode from an array of bytes passed by reference.
      *
      * @param array $bytes Byte array.
+     * @return mixed Decoded value.
      * @throws CborException If the byte array is not valid.
      */
     private static function recursiveDecode(&$bytes)
