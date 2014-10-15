@@ -331,7 +331,7 @@ class Cbor {
             $encoded = pack(PackFormat::FLOAT_32, $double);
 
             // Reverse the string on a little endian system
-            if(self::isLittleEndian())
+            if (self::isLittleEndian())
             {
                 $encoded = strrev($encoded);
             }
@@ -345,7 +345,7 @@ class Cbor {
             $encoded = pack(PackFormat::FLOAT_64, $double);
 
             // Reverse the string on a little endian system
-            if(self::isLittleEndian())
+            if (self::isLittleEndian())
             {
                 $encoded = strrev($encoded);
             }
