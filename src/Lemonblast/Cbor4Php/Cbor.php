@@ -327,13 +327,29 @@ class Cbor {
         // 32 bit double
         else if (self::exponentFits($exponent, self::IEEE754_FLOAT_32_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_32_FRACTION_LENGTH))
         {
-            return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . strrev(pack(PackFormat::FLOAT_32, $double));
+            $encoded = pack(PackFormat::FLOAT_32, $double);
+
+            // Reverse the string on a little endian system
+            if(self::isLittleEndian())
+            {
+                $encoded = strrev($encoded);
+            }
+
+            return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . $encoded;
         }
 
         // 64 bit double
         else
         {
-            return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . strrev(pack(PackFormat::FLOAT_64, $double));
+            $encoded = pack(PackFormat::FLOAT_64, $double);
+
+            // Reverse the string on a little endian system
+            if(self::isLittleEndian())
+            {
+                $encoded = strrev($encoded);
+            }
+
+            return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . $encoded;
         }
     }
 
