@@ -351,9 +351,23 @@ class Cbor {
 
         // Convert them to a string, in reverse order
         $string = '';
-        foreach (array_reverse($double_bytes) as $byte)
+
+        // A big endian system doesn't need the array reverse
+        if(self::isBigEndian())
         {
-            $string .= chr($byte);
+            foreach ($double_bytes as $byte)
+            {
+                $string .= chr($byte);
+            }
+        }
+
+        // Little endian, reverse
+        else
+        {
+            foreach (array_reverse($double_bytes) as $byte)
+            {
+                $string .= chr($byte);
+            }
         }
 
         // Unpack a 32 bit double
