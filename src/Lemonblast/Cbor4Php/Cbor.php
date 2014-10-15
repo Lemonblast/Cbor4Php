@@ -275,8 +275,11 @@ class Cbor {
         // Convert to byte array
         $bytes = unpack(PackFormat::UNIT_8_SET, $string);
 
-        // Reverse it, you want MSB first
-        $bytes = array_reverse($bytes);
+        // Reverse it on little endian systems, you want MSB first
+        if (!self::isBigEndian())
+        {
+            $bytes = array_reverse($bytes);
+        }
 
         // Get parameters
         $sign = ($bytes[0] >> 7) & 0b1;                                                                                // Sign is the first bit
@@ -353,7 +356,7 @@ class Cbor {
         $string = '';
 
         // A big endian system doesn't need the array reverse
-        if(self::isBigEndian())
+        if (self::isBigEndian())
         {
             foreach ($double_bytes as $byte)
             {
@@ -791,6 +794,16 @@ class Cbor {
     private static function isBigEndian()
     {
         return pack('L', 1) === pack('N', 1);
+    }
+
+    /**
+     * Determines if the PHP install is little endian.
+     *
+     * @return bool True if little endian, false otherwise.
+     */
+    function isLittleEndian()
+    {
+        return unpack('S',"\x01\x00")[1] === 1;
     }
 }
 
