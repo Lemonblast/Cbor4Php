@@ -273,12 +273,16 @@ class Cbor {
         $string = pack(PackFormat::FLOAT_64, $double);
 
         // Convert to byte array
-        $bytes = unpack(PackFormat::UNIT_8_SET, $string);
+        $byte_array = unpack(PackFormat::UNIT_8_SET, $string);
 
         // Reverse it on little endian systems, you want MSB first
-        if (!self::isBigEndian())
+        if (self::isLittleEndian())
         {
-            $bytes = array_reverse($bytes);
+            $bytes = array_reverse($byte_array);
+        }
+        else
+        {
+            $bytes = $byte_array;
         }
 
         // Get parameters
@@ -352,25 +356,21 @@ class Cbor {
         // Grab the required number of bytes
         $double_bytes = array_splice($bytes, 0, $length);
 
-        // Convert them to a string, in reverse order
-        $string = '';
-
-        // A big endian system doesn't need the array reverse
-        if (self::isBigEndian())
+        // A little endian system needs the bytes to be reversed
+        if (self::isLittleEndian())
         {
-            foreach ($double_bytes as $byte)
-            {
-                $string .= chr($byte);
-            }
+            $byte_array = array_reverse($double_bytes);
         }
-
-        // Little endian, reverse
         else
         {
-            foreach (array_reverse($double_bytes) as $byte)
-            {
-                $string .= chr($byte);
-            }
+            $byte_array = $double_bytes;
+        }
+
+        // Convert the bytes to a string
+        $string = '';
+        foreach ($byte_array as $byte)
+        {
+            $string .= chr($byte);
         }
 
         // Unpack a 32 bit double
@@ -787,21 +787,11 @@ class Cbor {
     }
 
     /**
-     * Determines if the PHP install is big endian.
-     *
-     * @return bool True if big endian, false otherwise.
-     */
-    private static function isBigEndian()
-    {
-        return pack('L', 1) === pack('N', 1);
-    }
-
-    /**
      * Determines if the PHP install is little endian.
      *
      * @return bool True if little endian, false otherwise.
      */
-    function isLittleEndian()
+    private static function isLittleEndian()
     {
         return unpack('S',"\x01\x00")[1] === 1;
     }
