@@ -1,6 +1,10 @@
 <?php namespace Lemonblast\Cbor4Php\Test;
 
 use Lemonblast\Cbor4Php\Cbor;
+use Lemonblast\Cbor4Php\Enums\AdditionalType;
+use Lemonblast\Cbor4Php\Enums\MajorType;
+use Lemonblast\Cbor4Php\Enums\PackFormat;
+use Lemonblast\Cbor4Php\Enums\Max;
 
 class CborTest extends \PHPUnit_Framework_TestCase
 {
