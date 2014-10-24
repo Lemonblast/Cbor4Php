@@ -6,6 +6,8 @@ use Lemonblast\Cbor4Php\Enums\MajorType;
 use Lemonblast\Cbor4Php\Enums\PackFormat;
 use Lemonblast\Cbor4Php\Enums\Max;
 
+const CBOR_EXCEPTION = 'Lemonblast\Cbor4Php\CborException';
+
 class CborTest extends \PHPUnit_Framework_TestCase
 {
     function testEncodeUINT5()
