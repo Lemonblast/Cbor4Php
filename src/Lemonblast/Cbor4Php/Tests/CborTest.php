@@ -288,6 +288,24 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(0xff), $decoded);
     }
+
+    function testEncodeResource()
+    {
+        $sock = socket_create(AF_INET, SOCK_STREAM, 0);
+
+        $encoded = Cbor::encode($sock);
+
+        $this->assertEquals(null, $encoded);
+    }
+
+    function testEncodeObject()
+    {
+        $object = (object)array('garbage in' => 'garbage out');
+
+        $encoded = Cbor::encode($object);
+
+        $this->assertEquals(null, $encoded);
+    }
 }
 
 ?>
