@@ -327,6 +327,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
         // Decode 255 with an extra byte
         $decoded = Cbor::decode(pack('C', 24) . pack('C', 255) . pack('C', 100));
     }
+
+    function testDecodeDoubleWithMissingBytes()
+    {
+        $this->setExpectedException(CBOR_EXCEPTION);
+
+        $decoded = Cbor::decode(pack('C*', 0xfb, 0x3f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00));
+    }
 }
 
 ?>
