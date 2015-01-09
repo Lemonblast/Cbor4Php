@@ -517,11 +517,6 @@ class Cbor {
     {
         $length = count($sequence);
 
-        if ($length > Max::UINT_64)
-        {
-            throw new CborException("Array is too long to be encoded in CBOR.");
-        }
-
         // Encode the length
         $data = self::encodeIntValue(MajorType::SEQUENCE, $length);
 
