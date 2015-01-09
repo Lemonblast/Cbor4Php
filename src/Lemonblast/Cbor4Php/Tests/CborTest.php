@@ -312,6 +312,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(null, $encoded);
     }
+
+    function testDecodePHPNull()
+    {
+        $decoded = Cbor::decode(null);
+
+        $this->assertEquals(null, $decoded);
+    }
 }
 
 ?>
