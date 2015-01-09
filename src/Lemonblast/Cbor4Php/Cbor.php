@@ -561,11 +561,6 @@ class Cbor {
     {
         $length = count($array);
 
-        if ($length > Max::UINT_64)
-        {
-            throw new CborException("Array is too long to be encoded in CBOR.");
-        }
-
         // Encode the length
         $data = self::encodeIntValue(MajorType::MAP, $length);
 
