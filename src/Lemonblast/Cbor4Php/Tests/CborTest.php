@@ -319,6 +319,14 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(null, $decoded);
     }
+
+    function testDecodeWithExtraByte()
+    {
+        $this->setExpectedException(CBOR_EXCEPTION);
+
+        // Decode 255 with an extra byte
+        $decoded = Cbor::decode(pack('C', 24) . pack('C', 255) . pack('C', 100));
+    }
 }
 
 ?>
