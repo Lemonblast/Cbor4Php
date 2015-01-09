@@ -154,7 +154,7 @@ class Cbor {
             case MajorType::SIMPLE_AND_FLOAT:
                 return self::decodeSimple($additional, $bytes);
 
-            case MajorType::TAG:
+            default:
                 return self::decodeTag($additional, $bytes);
         }
     }
