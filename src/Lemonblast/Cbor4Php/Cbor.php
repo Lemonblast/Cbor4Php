@@ -156,9 +156,6 @@ class Cbor {
 
             case MajorType::TAG:
                 return self::decodeTag($additional, $bytes);
-
-            default:
-                throw new CborException("$major isn't a valid CBOR Major Type.");
         }
     }
 
