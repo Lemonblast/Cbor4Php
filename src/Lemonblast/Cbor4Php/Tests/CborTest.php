@@ -334,6 +334,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
         $decoded = Cbor::decode(pack('C*', 0xfb, 0x3f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00));
     }
+
+    function testDecodeMapDuplicateKey()
+    {
+        $this->setExpectedException(CBOR_EXCEPTION);
+
+        $decoded = Cbor::decode(pack('C*', 0b10100011, 0b00000001, 0b00000001, 0b00000001, 0b00000010, 0b00000011, 0b00000011));
+    }
 }
 
 ?>
