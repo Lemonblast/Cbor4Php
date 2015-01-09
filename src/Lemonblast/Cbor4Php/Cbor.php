@@ -463,11 +463,6 @@ class Cbor {
     {
         $length = mb_strlen($string, self::STRING_ENCODING);
 
-        if ($length > Max::UINT_64)
-        {
-            throw new CborException("String is too long to be encoded in CBOR.");
-        }
-
         $data = self::encodeIntValue(MajorType::UTF8_STRING, $length);
 
         for ($i = 0; $i < $length; $i++)
