@@ -341,6 +341,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
         Cbor::decode(pack('C*', 0b10100011, 0b00000001, 0b00000001, 0b00000001, 0b00000010, 0b00000011, 0b00000011));
     }
+
+    function testDecodeUnknownSimple()
+    {
+        $this->setExpectedException(CBOR_EXCEPTION);
+
+        Cbor::decode(pack('C', 0b11110011));
+    }
 }
 
 ?>
