@@ -348,6 +348,13 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
         Cbor::decode(pack('C', 0b11110011));
     }
+
+    function testAbruptStringEnd()
+    {
+        $this->setExpectedException(CBOR_EXCEPTION);
+
+        Cbor::decode(pack('C*', 0b01111011, 97, 98));
+    }
 }
 
 ?>
