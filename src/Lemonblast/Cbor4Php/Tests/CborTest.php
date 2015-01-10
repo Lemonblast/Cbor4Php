@@ -320,6 +320,19 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $decoded);
     }
 
+    function testDecodeTag()
+    {
+        // Test proper value tagging
+        $decoded = Cbor::decode(pack('C*', 0b10000011, 0b11000011, 0b00000001, 0b00000010, 0b00000011));
+
+        $this->assertEquals(array(1,2,3), $decoded);
+
+        // Test if only tags are passed and no real value after
+        $this->setExpectedException(CBOR_EXCEPTION);
+
+        $decoded = Cbor::decode(pack('C*', 0b11000011));
+    }
+
     function testDecodeWithExtraByte()
     {
         $this->setExpectedException(CBOR_EXCEPTION);
