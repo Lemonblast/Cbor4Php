@@ -13,3 +13,29 @@ To install the library through composer, you simply need to add the following to
 }
 ```
 Once installed, you can use the Cbor class (`Lemonblast\Cbor4Php\Cbor`) to encode and decode CBOR data.
+
+## Usage
+Include the Cbor4Php library in your source:
+
+```PHP
+use Lemonblast\Cbor4Php\Cbor;
+```
+
+### Encoding
+To encode a variable into a CBOR byte string call the encode method and pass the value as a parameter:
+
+```PHP
+$foo = Cbor::encode($bar);
+```
+
+Encoding a PHP object or resource is not supported and will result in a null return value.
+
+### Decoding
+To decode a CBOR byte string into a PHP variable:
+
+```PHP
+$bar = Cbor::decode($foo);
+```
+
+CBOR data tags are ignored during the decode process.
+Decoding a null value or empty string will result in a null return value.
