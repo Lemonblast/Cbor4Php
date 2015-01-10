@@ -628,7 +628,7 @@ class Cbor {
     private static function decodeTag($additional, &$bytes)
     {
         // Ignore tags for now and return the next value
-        array_shift($bytes);
+        self::decodeIntValue($additional, $bytes);
         self::checkByteArrayLength($bytes, 1);
         return self::recursiveDecode($bytes);
     }
