@@ -812,10 +812,6 @@ class Cbor {
         {
             return true;
         }
-        else if ($num_bits == 0)
-        {
-            return false;
-        }
 
         // Shift right until you lose information
         while (!($significand & 0b1))
