@@ -1,10 +1,6 @@
 <?php namespace Lemonblast\Cbor4Php\Test;
 
 use Lemonblast\Cbor4Php\Cbor;
-use Lemonblast\Cbor4Php\Enums\AdditionalType;
-use Lemonblast\Cbor4Php\Enums\MajorType;
-use Lemonblast\Cbor4Php\Enums\PackFormat;
-use Lemonblast\Cbor4Php\Enums\Max;
 
 const CBOR_EXCEPTION = 'Lemonblast\Cbor4Php\CborException';
 
@@ -350,7 +346,7 @@ class CborTest extends \PHPUnit_Framework_TestCase
         // Test if only tags are passed and no real value after
         $this->setExpectedException(CBOR_EXCEPTION);
 
-        $decoded = Cbor::decode(pack('C*', 0b11000011));
+        Cbor::decode(pack('C*', 0b11000011));
     }
 
     function testDecodeWithExtraByte()
