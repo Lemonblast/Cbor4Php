@@ -28,7 +28,9 @@ To encode a variable into a CBOR byte string call the encode method and pass the
 $foo = Cbor::encode($bar);
 ```
 
-Encoding a PHP object or resource is not supported and will result in a null return value.
+Encoding an object will convert it to an associative array, and encode it as such. Only public fields will be encoded.
+
+Encoding a PHP resource is not supported and will result in a null return value.
 
 ### Decoding
 To decode a CBOR byte string into a PHP variable:
