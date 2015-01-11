@@ -25,6 +25,7 @@ class Cbor {
 
     const IEEE754_FLOAT_64_EXPONENT_OFFSET = 1023;
     const IEEE754_FLOAT_64_FRACTION_LENGTH = 52;
+    const IEEE754_FLOAT_64_EXPONENT_LENGTH = 11;
 
     /**
      * Encodes the supplied value into a CBOR string.
@@ -281,8 +282,8 @@ class Cbor {
         }
 
         // Get parameters
-        $sign = ($bytes[0] >> 7) & 0b1;                                                                                // Sign is the first bit
-        $exponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4)) - self::IEEE754_FLOAT_64_EXPONENT_OFFSET;    // Next 11 are the exponent
+        $sign = ($bytes[0] >> 7) & 0b1;                                         // Sign is the first bit
+        $rawExponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4));   // Next 11 are the exponent
 
         // Make the significand (Final 52 bits)
         $significand = ($bytes[1] & 0b1111) << (self::IEEE754_FLOAT_64_FRACTION_LENGTH - 4);
@@ -291,36 +292,59 @@ class Cbor {
             $significand += ($bytes[$i] << ((7 - $i) * 8));
         }
 
-        // 16 bit double
-        if (self::exponentFits($exponent, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_16_FRACTION_LENGTH))
+        // If the raw exponent is zero, it's either a signed zero or a subnormal
+        if ($rawExponent == 0)
+        {
+            // Signed zero, encode in 16 bit
+            if ($significand == 0)
+            {
+                return self::encodeFloat16($sign, $rawExponent, $significand);
+            }
+
+            // Subnormal, must be 64 bit, as the exponent is -1022
+            else
+            {
+                $realExponent = 1 - self::IEEE754_FLOAT_64_EXPONENT_OFFSET;
+            }
+        }
+
+        // Encoding infinity or NaN, you can do it 16 bit
+        else if ($rawExponent == (pow(2, self::IEEE754_FLOAT_64_EXPONENT_LENGTH) - 1))
+        {
+            // It's an infinity, encode as 16 bit float
+            if ($significand == 0)
+            {
+                return self::encodeFloat16($sign, pow(2, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) - 1, 0);
+            }
+
+            // It's a NaN, encode as 16 bit float
+            else
+            {
+                return self::encodeFloat16($sign, pow(2, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) - 1, 1 << (self::IEEE754_FLOAT_16_FRACTION_LENGTH - 1));
+            }
+        }
+
+        // Regular exponent, just remove the offset to get the real exponent
+        else
+        {
+            $realExponent = $rawExponent - self::IEEE754_FLOAT_64_EXPONENT_OFFSET;  // Real exponent is the raw one - 1023
+        }
+
+        // Can be exactly represented by a 16 bit float
+        if (self::exponentFits($realExponent, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_16_FRACTION_LENGTH))
         {
             // Shrink the significand down to the right number of bits
             $significand = self::significandShrink($significand, self::IEEE754_FLOAT_16_FRACTION_LENGTH);
 
-            // Make first byte
-            $first = self::encodeFirstByte($major, AdditionalType::FLOAT_16);
+            // Add the offset to make a raw exponent for the 16 bit float
+            $exponent = $realExponent + self::IEEE754_FLOAT_16_MAX_EXPONENT;
 
-            // Make the bit form exponent
-            if ($exponent == self::IEEE754_FLOAT_16_MIN_EXPONENT)
-            {
-                $exponent = 0;
-            }
-            else
-            {
-                $exponent = $exponent + self::IEEE754_FLOAT_16_MAX_EXPONENT;
-            }
-
-            // Make second byte
-            $second = (($sign << 7) & 0b10000000) | (($exponent << 2) & 0b01111100) | (($significand >> 8) & 0b11);
-
-            // And the third
-            $third = $significand & 255;
-
-            return $first . pack(PackFormat::UINT_8, $second) . pack(PackFormat::UINT_8, $third);
+            // Create the byte string
+            return self::encodeFloat16($sign, $exponent, $significand);
         }
 
-        // 32 bit double
-        else if (self::exponentFits($exponent, self::IEEE754_FLOAT_32_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_32_FRACTION_LENGTH))
+        // Can be exactly represented by a 32 bit float
+        else if (self::exponentFits($realExponent, self::IEEE754_FLOAT_32_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_32_FRACTION_LENGTH))
         {
             $encoded = pack(PackFormat::FLOAT_32, $double);
 
@@ -333,7 +357,7 @@ class Cbor {
             return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . $encoded;
         }
 
-        // 64 bit double
+        // Must be a 64 bit float
         else
         {
             $encoded = pack(PackFormat::FLOAT_64, $double);
@@ -346,6 +370,30 @@ class Cbor {
 
             return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . $encoded;
         }
+    }
+
+    /**
+     * Encodes a 16 bit float.
+     *
+     * @param $sign int The sign bit.
+     * @param $exponent int The exponent.
+     * @param $significand int The significand.
+     * @return string The byte string for the 16 bit float.
+     */
+    private static function encodeFloat16($sign, $exponent, $significand)
+    {
+        $major = MajorType::SIMPLE_AND_FLOAT;
+
+        // Make first byte
+        $first = self::encodeFirstByte($major, AdditionalType::FLOAT_16);
+
+        // Make second byte
+        $second = (($sign << 7) & 0b10000000) | (($exponent << 2) & 0b01111100) | (($significand >> 8) & 0b11);
+
+        // And the third
+        $third = $significand & 255;
+
+        return $first . pack(PackFormat::UINT_8, $second) . pack(PackFormat::UINT_8, $third);
     }
 
     /**
@@ -420,11 +468,42 @@ class Cbor {
                 }
             }
 
-            // Do the math
-            if ($exponent == 0)
+            // If it's a signed zero
+            if ($exponent == 0 && $significand == 0)
+            {
+                return 0.0;
+            }
+
+            // It's a subnormal
+            else if ($exponent == 0)
             {
                 $double = pow(-1, $sign) * pow(2, self::IEEE754_FLOAT_16_MIN_EXPONENT) * $decimal;
             }
+
+            // It's a signed infinity or NaN
+            else if ($exponent == (pow(2, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) - 1))
+            {
+                // Signed infinity
+                if ($significand == 0)
+                {
+                    if ($sign == 0)
+                    {
+                        return INF;
+                    }
+                    else
+                    {
+                        return -INF;
+                    }
+                }
+
+                // It's a NaN
+                else
+                {
+                    return NAN;
+                }
+            }
+
+            // Regular float
             else
             {
                 $double = pow(-1, $sign) * pow(2, $exponent - self::IEEE754_FLOAT_16_MAX_EXPONENT) * (1 + $decimal);
