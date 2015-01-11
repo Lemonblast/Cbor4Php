@@ -240,11 +240,19 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $encoded2 = Cbor::encode(1.5);
         $encoded3 = Cbor::encode(0.5);
         $encoded4 = Cbor::encode(-0.5);
+        $encoded5 = Cbor::encode(0.0);
+        $encoded6 = Cbor::encode(INF);
+        $encoded7 = Cbor::encode(-INF);
+        $encoded8 = Cbor::encode(NAN);
 
         $this->assertEquals(pack('C*',0xf9, 0x24, 0x00), $encoded1);
         $this->assertEquals(pack('C*',0xf9, 0x3e, 0x00), $encoded2);
         $this->assertEquals(pack('C*',0xf9, 0x38, 0x00), $encoded3);
         $this->assertEquals(pack('C*',0xf9, 0xb8, 0x00), $encoded4);
+        $this->assertEquals(pack('C*',0xf9, 0x00, 0x00), $encoded5);
+        $this->assertEquals(pack('C*',0xf9, 0x7c, 0x00), $encoded6);
+        $this->assertEquals(pack('C*',0xf9, 0xfc, 0x00), $encoded7);
+        $this->assertEquals(pack('C*',0xf9, 0x7e, 0x00), $encoded8);
     }
 
     function testDecodeFloat_16()
@@ -254,10 +262,22 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $decoded3 = Cbor::decode(pack('C*',0xf9, 0x38, 0x00));
         $decoded4 = Cbor::decode(pack('C*',0xf9, 0xb8, 0x00));
 
+        $decoded5 = Cbor::decode(pack('C*',0xf9, 0x00, 0x00));
+        $decoded6 = Cbor::decode(pack('C*',0xf9, 0x80, 0x00)); // -0.0
+        $decoded7 = Cbor::decode(pack('C*',0xf9, 0x7c, 0x00));
+        $decoded8 = Cbor::decode(pack('C*',0xf9, 0xfc, 0x00));
+        $decoded9 = Cbor::decode(pack('C*',0xf9, 0x7e, 0x00));
+
         $this->assertEquals(0.015625, $decoded1);
         $this->assertEquals(1.5, $decoded2);
         $this->assertEquals(0.5, $decoded3);
         $this->assertEquals(-0.5, $decoded4);
+
+        $this->assertEquals(0.0, $decoded5);
+        $this->assertEquals(0.0, $decoded6);
+        $this->assertEquals(INF, $decoded7);
+        $this->assertEquals(-INF, $decoded8);
+        $this->assertTrue(is_nan($decoded9));
     }
 
     function testEncodeDouble_32()
