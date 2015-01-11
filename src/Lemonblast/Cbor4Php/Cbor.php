@@ -68,6 +68,8 @@ class Cbor {
             case "unknown type":
                 return self::encodeUndefined();
 
+            case "object":
+                return self::encode(self::objectToMap($decoded));
         }
 
         // Unknown type, just return null
@@ -865,6 +867,30 @@ class Cbor {
     private static function isLittleEndian()
     {
         return unpack('S',"\x01\x00")[1] === 1;
+    }
+
+    /**
+     * Converts an object to a map.
+     *
+     * @param $object Object to convert.
+     * @return array The Map.
+     */
+    private static function objectToMap($object)
+    {
+        // If it's an object or an array, convert to a map
+        if (is_array($object) || is_object($object))
+        {
+            $result = array();
+            foreach ($object as $key => $value)
+            {
+                $result[$key] = self::objectToMap($value);
+            }
+
+            return $result;
+        }
+
+        // Just return the raw value
+        return $object;
     }
 }
 

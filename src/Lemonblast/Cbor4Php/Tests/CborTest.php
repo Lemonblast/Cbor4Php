@@ -322,11 +322,20 @@ class CborTest extends \PHPUnit_Framework_TestCase
 
     function testEncodeObject()
     {
-        $object = (object)array('garbage in' => 'garbage out');
+        // Make a nested array
+        $nArray = array('NKey' => 'NVal');
+        $array = array('Key1' => 'Val1', 'Key2' => $nArray);
 
-        $encoded = Cbor::encode($object);
+        // Make a nested object out of the array
+        $nObject = (object) $nArray;
+        $object = (object) $array;
+        $object->Key2 = $nObject;
 
-        $this->assertEquals(null, $encoded);
+        // Encode the object and the map
+        $encodedObject = Cbor::encode($object);
+        $encodedArray = Cbor::encode($array);
+
+        $this->assertEquals($encodedArray, $encodedObject);
     }
 
     function testDecodePHPNull()
