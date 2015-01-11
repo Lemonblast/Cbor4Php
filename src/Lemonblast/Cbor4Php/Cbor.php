@@ -68,11 +68,10 @@ class Cbor {
             case "unknown type":
                 return self::encodeUndefined();
 
-            case "object":
-            case "resource":
-            default:
-                return null;
         }
+
+        // Unknown type, just return null
+        return null;
     }
 
     /**
@@ -183,10 +182,11 @@ class Cbor {
 
             case $value <= Max::UINT_32:
                 return self::encodeFirstByte($major_type, AdditionalType::UINT_32) . pack(PackFormat::UINT_32, $value);
-        }
 
-        // Must be 64 if it's not in any of the previous cases
-        return self::encodeFirstByte($major_type, AdditionalType::UINT_64) . pack(PackFormat::UINT_64, $value >> 32, $value & 0xffffffff);
+            // Must be 64 if it's not in any of the previous cases
+            default:
+                return self::encodeFirstByte($major_type, AdditionalType::UINT_64) . pack(PackFormat::UINT_64, $value >> 32, $value & 0xffffffff);
+        }
     }
 
     /**
