@@ -264,6 +264,8 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $decoded8 = Cbor::decode(pack('C*',0xf9, 0xfc, 0x00));
         $decoded9 = Cbor::decode(pack('C*',0xf9, 0x7e, 0x00));
 
+        $subnormal = Cbor::decode(pack('C*',0xf9, 0x00, 0x01));
+
         $this->assertEquals(0.015625, $decoded1);
         $this->assertEquals(1.5, $decoded2);
         $this->assertEquals(0.5, $decoded3);
@@ -274,6 +276,8 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(INF, $decoded7);
         $this->assertEquals(-INF, $decoded8);
         $this->assertTrue(is_nan($decoded9));
+
+        $this->assertEquals(pow(2, -24), $subnormal);
     }
 
     function testEncodeDouble_32()
