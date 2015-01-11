@@ -293,8 +293,10 @@ class CborTest extends \PHPUnit_Framework_TestCase
     function testEncodeDouble_64()
     {
         $encoded = Cbor::encode(1.7);
+        $subnormal = Cbor::encode(pow(2, -1 * 1074));
 
         $this->assertEquals(pack('C*', 0xfb, 0x3f, 0xfb, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), $encoded);
+        $this->assertEquals(pack('C*', 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01), $subnormal);
     }
 
     function testDecodeDouble_64()
