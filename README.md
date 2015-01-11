@@ -21,7 +21,7 @@ Include the Cbor4Php library in your source:
 use Lemonblast\Cbor4Php\Cbor;
 ```
 
-### Encoding
+#### Encoding
 To encode a variable into a CBOR byte string call the encode method and pass the value as a parameter:
 
 ```PHP
@@ -32,7 +32,7 @@ Encoding an object will convert it to an associative array, and encode it as suc
 
 Encoding a PHP resource is not supported and will result in a null return value.
 
-### Decoding
+#### Decoding
 To decode a CBOR byte string into a PHP variable:
 
 ```PHP
