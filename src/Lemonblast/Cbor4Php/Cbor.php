@@ -274,14 +274,7 @@ class Cbor {
         $byte_array = unpack(PackFormat::UNIT_8_SET, $string);
 
         // Reverse it on little endian systems, you want MSB first
-        if (self::isLittleEndian())
-        {
-            $bytes = array_reverse($byte_array);
-        }
-        else
-        {
-            $bytes = $byte_array;
-        }
+        $bytes = self::reverseIfLittleEndian($byte_array);
 
         // Get parameters
         $sign = ($bytes[0] >> 7) & 0b1;                                         // Sign is the first bit
@@ -350,13 +343,7 @@ class Cbor {
         {
             $encoded = pack(PackFormat::FLOAT_32, $double);
 
-            // Reverse the string on a little endian system
-            if (self::isLittleEndian())
-            {
-                $encoded = strrev($encoded);
-            }
-
-            return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . $encoded;
+            return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . self::reverseIfLittleEndian($encoded);
         }
 
         // Must be a 64 bit float
@@ -364,13 +351,7 @@ class Cbor {
         {
             $encoded = pack(PackFormat::FLOAT_64, $double);
 
-            // Reverse the string on a little endian system
-            if (self::isLittleEndian())
-            {
-                $encoded = strrev($encoded);
-            }
-
-            return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . $encoded;
+            return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . self::reverseIfLittleEndian($encoded);
         }
     }
 
@@ -418,14 +399,7 @@ class Cbor {
         $double_bytes = array_splice($bytes, 0, $length);
 
         // A little endian system needs the bytes to be reversed
-        if (self::isLittleEndian())
-        {
-            $byte_array = array_reverse($double_bytes);
-        }
-        else
-        {
-            $byte_array = $double_bytes;
-        }
+        $byte_array = self::reverseIfLittleEndian($double_bytes);
 
         // Convert the bytes to a string
         $string = '';
@@ -860,16 +834,6 @@ class Cbor {
     }
 
     /**
-     * Determines if the PHP install is little endian.
-     *
-     * @return bool True if little endian, false otherwise.
-     */
-    private static function isLittleEndian()
-    {
-        return unpack('S',"\x01\x00")[1] === 1;
-    }
-
-    /**
      * Converts an object to a map.
      *
      * @param $object Object to convert.
@@ -891,6 +855,37 @@ class Cbor {
 
         // Just return the raw value
         return $object;
+    }
+
+    /**
+     * Reverses an array or string if the system is little endian.
+     *
+     * @param $toCheck array|string The array/string;
+     * @return array|string The original array/string if on a big endian system, otherwise a reversed version.
+     */
+    private static function reverseIfLittleEndian($toCheck)
+    {
+        // Little endian, needs to be reversed
+        if (unpack('S',"\x01\x00")[1] === 1)
+        {
+            // Reverse an array
+            if (is_array($toCheck))
+            {
+                return array_reverse($toCheck);
+            }
+
+            // Reverse a string
+            else
+            {
+                return strrev($toCheck);
+            }
+        }
+
+        // Big endian, no need to reverse
+        else
+        {
+            return $toCheck;
+        }
     }
 }
 
