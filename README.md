@@ -41,3 +41,8 @@ $bar = Cbor::decode($foo);
 
 CBOR data tags are ignored during the decode process.
 Decoding a null value or empty string will result in a null return value.
+
+## Testing
+To run unit tests, simply clone this repository and run `composer install` followed by `php vendor/bin/phpunit` in the project directory.
+
+
