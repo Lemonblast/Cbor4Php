@@ -1,6 +1,9 @@
 <?php namespace Lemonblast\Cbor4Php;
 
 use Lemonblast\Cbor4Php\Enums\AdditionalType;
+use Lemonblast\Cbor4Php\Types\Float\Float16;
+use Lemonblast\Cbor4Php\Types\Float\Float32;
+use Lemonblast\Cbor4Php\Types\Float\Float64;
 use Lemonblast\Cbor4Php\Enums\MajorType;
 use Lemonblast\Cbor4Php\Enums\PackFormat;
 use Lemonblast\Cbor4Php\Enums\Max;
@@ -13,19 +16,8 @@ use Lemonblast\Cbor4Php\Enums\Max;
  */
 class Cbor {
 
+    /** The string encoding to use. */
     const STRING_ENCODING = "UTF-8";
-
-    const IEEE754_FLOAT_16_EXPONENT_LENGTH = 5;
-    const IEEE754_FLOAT_16_FRACTION_LENGTH = 10;
-    const IEEE754_FLOAT_16_MIN_EXPONENT = -14;
-    const IEEE754_FLOAT_16_MAX_EXPONENT = 15;
-
-    const IEEE754_FLOAT_32_EXPONENT_LENGTH = 8;
-    const IEEE754_FLOAT_32_FRACTION_LENGTH = 23;
-
-    const IEEE754_FLOAT_64_EXPONENT_OFFSET = 1023;
-    const IEEE754_FLOAT_64_FRACTION_LENGTH = 52;
-    const IEEE754_FLOAT_64_EXPONENT_LENGTH = 11;
 
     /**
      * Encodes the supplied value into a CBOR string.
@@ -265,118 +257,27 @@ class Cbor {
      */
     private static function encodeDouble($double)
     {
-        $major = MajorType::SIMPLE_AND_FLOAT;
-
-        // Get a byte string as a 64 bit double for maximum accuracy
-        $string = pack(PackFormat::FLOAT_64, $double);
-
-        // Convert to byte array
-        $byte_array = unpack(PackFormat::UNIT_8_SET, $string);
-
-        // Reverse it on little endian systems, you want MSB first
-        $bytes = self::reverseIfLittleEndian($byte_array);
-
-        // Get parameters
-        $sign = ($bytes[0] >> 7) & 0b1;                                         // Sign is the first bit
-        $rawExponent = (((($bytes[0]) & 0b1111111) << 4) | ($bytes[1] >> 4));   // Next 11 are the exponent
-
-        // Make the significand (Final 52 bits)
-        $significand = ($bytes[1] & 0b1111) << (self::IEEE754_FLOAT_64_FRACTION_LENGTH - 4);
-        for ($i = 2; $i < 8; $i++)
-        {
-            $significand += ($bytes[$i] << ((7 - $i) * 8));
-        }
-
-        // If the raw exponent is zero, it's either a signed zero or a subnormal
-        if ($rawExponent == 0)
-        {
-            // Signed zero, encode in 16 bit
-            if ($significand == 0)
-            {
-                return self::encodeFloat16($sign, $rawExponent, $significand);
-            }
-
-            // Subnormal, must be 64 bit, as the exponent is -1022
-            else
-            {
-                $realExponent = 1 - self::IEEE754_FLOAT_64_EXPONENT_OFFSET;
-            }
-        }
-
-        // Encoding infinity or NaN, you can do it 16 bit
-        else if ($rawExponent == (pow(2, self::IEEE754_FLOAT_64_EXPONENT_LENGTH) - 1))
-        {
-            // It's an infinity, encode as 16 bit float
-            if ($significand == 0)
-            {
-                return self::encodeFloat16($sign, pow(2, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) - 1, 0);
-            }
-
-            // It's a NaN, encode as 16 bit float
-            else
-            {
-                return self::encodeFloat16($sign, pow(2, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) - 1, 1 << (self::IEEE754_FLOAT_16_FRACTION_LENGTH - 1));
-            }
-        }
-
-        // Regular exponent, just remove the offset to get the real exponent
-        else
-        {
-            $realExponent = $rawExponent - self::IEEE754_FLOAT_64_EXPONENT_OFFSET;  // Real exponent is the raw one - 1023
-        }
+        // Make a 64 bit float out of the double
+        $float = new Float64($double);
 
         // Can be exactly represented by a 16 bit float
-        if (self::exponentFits($realExponent, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_16_FRACTION_LENGTH))
+        if (Float16::fits($float))
         {
-            // Shrink the significand down to the right number of bits
-            $significand = self::significandShrink($significand, self::IEEE754_FLOAT_16_FRACTION_LENGTH);
-
-            // Add the offset to make a raw exponent for the 16 bit float
-            $exponent = $realExponent + self::IEEE754_FLOAT_16_MAX_EXPONENT;
-
             // Create the byte string
-            return self::encodeFloat16($sign, $exponent, $significand);
+            return Float16::encode($float);
         }
 
-        // Can be exactly represented by a 32 bit float
-        else if (self::exponentFits($realExponent, self::IEEE754_FLOAT_32_EXPONENT_LENGTH) && self::significandFits($significand, self::IEEE754_FLOAT_32_FRACTION_LENGTH))
+        // Can be exactly represented by a 32 bit float, or a 32 bit subnormal
+        else if (Float32::fits($float))
         {
-            $encoded = pack(PackFormat::FLOAT_32, $double);
-
-            return self::encodeFirstByte($major, AdditionalType::FLOAT_32) . self::reverseIfLittleEndian($encoded);
+            return Float32::encode($double);
         }
 
         // Must be a 64 bit float
         else
         {
-            $encoded = pack(PackFormat::FLOAT_64, $double);
-
-            return self::encodeFirstByte($major, AdditionalType::FLOAT_64) . self::reverseIfLittleEndian($encoded);
+            return Float64::encode($double);
         }
-    }
-
-    /**
-     * Encodes a 16 bit float.
-     *
-     * @param $sign int The sign bit.
-     * @param $exponent int The exponent.
-     * @param $significand int The significand.
-     * @return string The byte string for the 16 bit float.
-     */
-    private static function encodeFloat16($sign, $exponent, $significand)
-    {
-        $major = MajorType::SIMPLE_AND_FLOAT;
-
-        // Make first byte
-        $first = self::encodeFirstByte($major, AdditionalType::FLOAT_16);
-
-        // Make second byte
-        $second = (($sign << 7) & 0b10000000) | (($exponent << 2) & 0b01111100) | (($significand >> 8) & 0b11);
-
-        // And the third
-        $third = $significand & 255;
-
-        return $first . pack(PackFormat::UINT_8, $second) . pack(PackFormat::UINT_8, $third);
     }
 
     /**
@@ -396,96 +297,24 @@ class Cbor {
         }
 
         // Grab the required number of bytes
-        $double_bytes = array_splice($bytes, 0, $length);
-
-        // A little endian system needs the bytes to be reversed
-        $byte_array = self::reverseIfLittleEndian($double_bytes);
-
-        // Convert the bytes to a string
-        $string = '';
-        foreach ($byte_array as $byte)
-        {
-            $string .= chr($byte);
-        }
+        $byteArray = array_splice($bytes, 0, $length);
 
         // Unpack a 32 bit double
         if ($length == 4)
         {
-            $doubles = unpack(PackFormat::FLOAT_32, $string);
-            return array_shift($doubles);
+            return Float32::decode($byteArray);
         }
 
         // Unpack a 64 bit double
         else if ($length == 8)
         {
-            $doubles = unpack(PackFormat::FLOAT_64, $string);
-            return array_shift($doubles);
+            return Float64::decode($byteArray);
         }
 
         // Unpack a 16 bit double
         else
         {
-            // Grab both bytes
-            $msb = array_shift($double_bytes);
-            $lsb = array_shift($double_bytes);
-
-            // Get the components of the double
-            $sign = ($msb >> 7) & 0b1;                  // Sign is the first bit
-            $exponent = ($msb >> 2) & 0b11111;          // Next 5 are the exponent
-            $significand = $lsb | (($msb & 0b11) << 8); // Final 10 are the significand
-
-            // Convert the significand to a float
-            $decimal = 0;
-            for ($i = 9; $i >= 0; $i--)
-            {
-                if (($significand >> ($i)) & 0b1)
-                {
-                    $decimal += pow(2, -1 * (10 - $i));
-                }
-            }
-
-            // If it's a signed zero
-            if ($exponent == 0 && $significand == 0)
-            {
-                return 0.0;
-            }
-
-            // It's a subnormal
-            else if ($exponent == 0)
-            {
-                $double = pow(-1, $sign) * pow(2, self::IEEE754_FLOAT_16_MIN_EXPONENT) * $decimal;
-            }
-
-            // It's a signed infinity or NaN
-            else if ($exponent == (pow(2, self::IEEE754_FLOAT_16_EXPONENT_LENGTH) - 1))
-            {
-                // Signed infinity
-                if ($significand == 0)
-                {
-                    if ($sign == 0)
-                    {
-                        return INF;
-                    }
-                    else
-                    {
-                        return -INF;
-                    }
-                }
-
-                // It's a NaN
-                else
-                {
-                    return NAN;
-                }
-            }
-
-            // Regular float
-            else
-            {
-                $double = pow(-1, $sign) * pow(2, $exponent - self::IEEE754_FLOAT_16_MAX_EXPONENT) * (1 + $decimal);
-            }
-
-            return $double;
+            return Float16::decode($byteArray);
         }
     }
 
@@ -753,7 +582,7 @@ class Cbor {
      * @param int $additional The additional type to use.
      * @return string The encoded byte string.
      */
-    private static function encodeFirstByte($major, $additional)
+    public static function encodeFirstByte($major, $additional)
     {
         $first_byte = ($major & MajorType::BIT_MASK) | ($additional & AdditionalType::BIT_MASK);
         return pack(PackFormat::UINT_8, $first_byte);
@@ -772,65 +601,6 @@ class Cbor {
         {
             throw new CborException("CBOR byte stream abruptly ended.");
         }
-    }
-
-    /**
-     * Determines if a significand "fits" in $num_bits bits.
-     *
-     * @param int $significand The significand to check.
-     * @param int $num_bits The number of bits to check fit for.
-     * @return bool If the significand fits in the specified $bit_num.
-     */
-    private static function significandFits($significand, $num_bits)
-    {
-        // If it's zero, it'll fit in any number of bits (Except zero)
-        if ($significand == 0)
-        {
-            return true;
-        }
-
-        // Shift right until you lose information
-        while (!($significand & 0b1))
-        {
-            $significand = $significand >> 1;
-        }
-
-        // Determine if the number is smaller than allowable
-        return $significand <= (pow(2, $num_bits) - 1);
-    }
-
-    /**
-     * Shrinks the significand to the required number of bits.
-     *
-     * @param int $significand Significand to shrink.
-     * @param int $num_bits Number of bits to shrink it to.
-     * @return int The shrunken significand.
-     */
-    private static function significandShrink($significand, $num_bits)
-    {
-        $max = (pow(2, $num_bits) - 1);
-
-        while ($significand > $max)
-        {
-            $significand = $significand >> 1;
-        }
-
-        return $significand;
-    }
-
-    /**
-     * Determines if the given exponent fits into the given number of bits.
-     *
-     * @param int $exponent The exponent to check.
-     * @param int $num_bits The number of bits to check for fit.
-     * @return bool If the exponent fits in the specified number of bits.
-     */
-    private static function exponentFits($exponent, $num_bits)
-    {
-        $max = floor((pow(2, $num_bits) - 1) / 2);
-        $min = (-1 * $max) + 1;
-
-        return (($exponent >= $min) && ($exponent <= $max));
     }
 
     /**
@@ -855,37 +625,6 @@ class Cbor {
 
         // Just return the raw value
         return $object;
-    }
-
-    /**
-     * Reverses an array or string if the system is little endian.
-     *
-     * @param $toCheck array|string The array/string;
-     * @return array|string The original array/string if on a big endian system, otherwise a reversed version.
-     */
-    private static function reverseIfLittleEndian($toCheck)
-    {
-        // Little endian, needs to be reversed
-        if (unpack('S',"\x01\x00")[1] === 1)
-        {
-            // Reverse an array
-            if (is_array($toCheck))
-            {
-                return array_reverse($toCheck);
-            }
-
-            // Reverse a string
-            else
-            {
-                return strrev($toCheck);
-            }
-        }
-
-        // Big endian, no need to reverse
-        else
-        {
-            return $toCheck;
-        }
     }
 }
 
