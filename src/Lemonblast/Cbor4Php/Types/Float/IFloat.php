@@ -5,7 +5,7 @@
  * based on the float type.
  *
  * Interface IFloat
- * @package Lemonblast\Cbor4Php\Float
+ * @package Lemonblast\Cbor4Php\Types\Float
  */
 interface IFloat {
 

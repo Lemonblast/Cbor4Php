@@ -6,7 +6,7 @@ use Lemonblast\Cbor4Php\Enums\PackFormat;
  * Defines constants and logic for 64 bit floats.
  *
  * Class Float64
- * @package Lemonblast\Cbor4Php\Float
+ * @package Lemonblast\Cbor4Php\Types\Float
  */
 class Float64 extends AbstractFloat {
 

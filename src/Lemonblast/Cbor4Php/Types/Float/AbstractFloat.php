@@ -7,7 +7,7 @@ use Lemonblast\Cbor4Php\Enums\MajorType;
  * Defines an abstract class for float types, so we have a place for common methods.
  *
  * Abstract Class AbstractFloat
- * @package Lemonblast\Cbor4Php\Float
+ * @package Lemonblast\Cbor4Php\Types\Float
  */
 abstract class AbstractFloat implements IFloat {
 
