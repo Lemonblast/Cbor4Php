@@ -22,6 +22,7 @@
     <filter>
         <whitelist>
             <file>src/Lemonblast/Cbor4Php/Cbor.php</file>
+            <directory suffix=".php">src/Lemonblast/Cbor4Php/Types</directory>
         </whitelist>
     </filter>
     

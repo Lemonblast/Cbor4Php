@@ -230,84 +230,216 @@ class CborTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1 => 1, 2 => 2, 3 => 3), $decoded);
     }
 
-    function testEncodeFloat_16()
+    function testEncodeFloat16Basic()
     {
         $encoded1 = Cbor::encode(0.015625);
         $encoded2 = Cbor::encode(1.5);
         $encoded3 = Cbor::encode(0.5);
         $encoded4 = Cbor::encode(-0.5);
-        $encoded5 = Cbor::encode(0.0);
-        $encoded6 = Cbor::encode(INF);
-        $encoded7 = Cbor::encode(-INF);
-        $encoded8 = Cbor::encode(NAN);
 
         $this->assertEquals(pack('C*',0xf9, 0x24, 0x00), $encoded1);
         $this->assertEquals(pack('C*',0xf9, 0x3e, 0x00), $encoded2);
         $this->assertEquals(pack('C*',0xf9, 0x38, 0x00), $encoded3);
         $this->assertEquals(pack('C*',0xf9, 0xb8, 0x00), $encoded4);
-        $this->assertEquals(pack('C*',0xf9, 0x00, 0x00), $encoded5);
-        $this->assertEquals(pack('C*',0xf9, 0x7c, 0x00), $encoded6);
-        $this->assertEquals(pack('C*',0xf9, 0xfc, 0x00), $encoded7);
-        $this->assertEquals(pack('C*',0xf9, 0x7e, 0x00), $encoded8);
     }
 
-    function testDecodeFloat_16()
+    function testEncodeFloat16Special()
     {
-        $decoded1 = Cbor::decode(pack('C*',0xf9, 0x24, 0x00));
-        $decoded2 = Cbor::decode(pack('C*',0xf9, 0x3e, 0x00));
-        $decoded3 = Cbor::decode(pack('C*',0xf9, 0x38, 0x00));
-        $decoded4 = Cbor::decode(pack('C*',0xf9, 0xb8, 0x00));
+        $zero = Cbor::encode(0.0);
+        $positiveInfinity = Cbor::encode(INF);
+        $negativeInfinity = Cbor::encode(-INF);
+        $nan = Cbor::encode(NAN);
 
-        $decoded5 = Cbor::decode(pack('C*',0xf9, 0x00, 0x00));
-        $decoded6 = Cbor::decode(pack('C*',0xf9, 0x80, 0x00)); // -0.0
-        $decoded7 = Cbor::decode(pack('C*',0xf9, 0x7c, 0x00));
-        $decoded8 = Cbor::decode(pack('C*',0xf9, 0xfc, 0x00));
-        $decoded9 = Cbor::decode(pack('C*',0xf9, 0x7e, 0x00));
+        $this->assertEquals(pack('C*',0xf9, 0x00, 0x00), $zero);
+        $this->assertEquals(pack('C*',0xf9, 0x7c, 0x00), $positiveInfinity);
+        $this->assertEquals(pack('C*',0xf9, 0xfc, 0x00), $negativeInfinity);
+        $this->assertEquals(pack('C*',0xf9, 0x7e, 0x00), $nan);
+    }
 
-        $subnormal = Cbor::decode(pack('C*',0xf9, 0x00, 0x01));
+    function testEncodeFloat16Subnormal()
+    {
+        $minSubnormal = Cbor::encode(pow(2, -24));
+        $midsubnormal1 = Cbor::encode(pow(2, -17));
+        $midsubnormal2 = Cbor::encode(-pow(2, -17));
+        $maxSubnormal = Cbor::encode(pow(2, -14) - pow(2, -24));
+
+        $this->assertEquals(pack('C*',0xf9, 0x00, 0x01), $minSubnormal);
+        $this->assertEquals(pack('C*',0xf9, 0x00, 0x80), $midsubnormal1);
+        $this->assertEquals(pack('C*',0xf9, 0x80, 0x80), $midsubnormal2);
+        $this->assertEquals(pack('C*',0xf9, 0x03, 0xFF), $maxSubnormal);
+    }
+
+    function testDecodeFloat16Basic()
+    {
+        $decoded1 = Cbor::decode(pack('C*', 0xf9, 0x24, 0x00));
+        $decoded2 = Cbor::decode(pack('C*', 0xf9, 0x3e, 0x00));
+        $decoded3 = Cbor::decode(pack('C*', 0xf9, 0x38, 0x00));
+        $decoded4 = Cbor::decode(pack('C*', 0xf9, 0xb8, 0x00));
 
         $this->assertEquals(0.015625, $decoded1);
         $this->assertEquals(1.5, $decoded2);
         $this->assertEquals(0.5, $decoded3);
         $this->assertEquals(-0.5, $decoded4);
-
-        $this->assertEquals(0.0, $decoded5);
-        $this->assertEquals(0.0, $decoded6);
-        $this->assertEquals(INF, $decoded7);
-        $this->assertEquals(-INF, $decoded8);
-        $this->assertTrue(is_nan($decoded9));
-
-        $this->assertEquals(pow(2, -24), $subnormal);
     }
 
-    function testEncodeDouble_32()
+    function testDecodeFloat16Special()
     {
-        $encoded = Cbor::encode(100000.0);
+        $positiveZero = Cbor::decode(pack('C*', 0xf9, 0x00, 0x00));
+        $negativeZero = Cbor::decode(pack('C*', 0xf9, 0x80, 0x00)); // -0.0
+        $positiveInfinity = Cbor::decode(pack('C*', 0xf9, 0x7c, 0x00));
+        $negativeInfinity = Cbor::decode(pack('C*', 0xf9, 0xfc, 0x00));
+        $nan = Cbor::decode(pack('C*', 0xf9, 0x7e, 0x00));
 
-        $this->assertEquals(pack('C*', 0xfa, 0x47, 0xc3, 0x50, 0x00), $encoded);
+        $this->assertEquals(0.0, $positiveZero);
+        $this->assertEquals(0.0, $negativeZero);
+        $this->assertEquals(INF, $positiveInfinity);
+        $this->assertEquals(-INF, $negativeInfinity);
+        $this->assertTrue(is_nan($nan));
     }
 
-    function testDecodeDouble_32()
+    function testDecodeFloat16Subnormal()
     {
-        $decoded = Cbor::decode(pack('C*', 0xfa, 0x3f, 0xc0, 0x00, 0x00));
+        $minSubnormal = Cbor::decode(pack('C*', 0xf9, 0x00, 0x01));
+        $midSubnormal = Cbor::decode(pack('C*', 0xf9, 0x00, 0x80));
+        $maxSubnormal = Cbor::decode(pack('C*', 0xf9, 0x03, 0xff));
 
-        $this->assertEquals(1.5, $decoded);
+        $this->assertEquals(pow(2, -24), $minSubnormal);
+        $this->assertEquals(pow(2, -17), $midSubnormal);
+        $this->assertEquals(pow(2, -14) - pow(2, -24), $maxSubnormal);
     }
 
-    function testEncodeDouble_64()
+    function testEncodeFloat32Basic()
     {
-        $encoded = Cbor::encode(1.7);
-        $subnormal = Cbor::encode(pow(2, -1 * 1074));
+        $encoded1 = Cbor::encode(100000.0);
+        $encoded2 = Cbor::encode(pow(2, -1 * 27));
+        $encoded3 = Cbor::encode(-(pow(2, -30) + pow(2,-31)));
+        $encoded4 = Cbor::encode((pow(2, -25) + pow(2,-35)));
 
-        $this->assertEquals(pack('C*', 0xfb, 0x3f, 0xfb, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), $encoded);
-        $this->assertEquals(pack('C*', 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01), $subnormal);
+        $this->assertEquals(pack('C*', 0xfa, 0x47, 0xc3, 0x50, 0x00), $encoded1);
+        $this->assertEquals(pack('C*', 0xfa, 0x32, 0x00, 0x00, 0x00), $encoded2);
+        $this->assertEquals(pack('C*', 0xfa, 0xb0, 0xc0, 0x00, 0x00), $encoded3);
+        $this->assertEquals(pack('C*', 0xfa, 0x33, 0x00, 0x20, 0x00), $encoded4);
     }
 
-    function testDecodeDouble_64()
+    function testEncodeFloat32Subnormal()
     {
-        $decoded = Cbor::decode(pack('C*', 0xfb, 0x3f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00,0x00));
+        $minSubnormal = Cbor::encode(pow(2, -149));
+        $midsubnormal1 = Cbor::encode(pow(2, -100));
+        $midsubnormal2 = Cbor::encode(-pow(2, -100));
+        $maxSubnormal = Cbor::encode(pow(2, -126) - pow(2, -149));
 
-        $this->assertEquals(1.5, $decoded);
+        $this->assertEquals(pack('C*',0xfa, 0x00, 0x00, 0x00, 0x01), $minSubnormal);
+        $this->assertEquals(pack('C*',0xfa, 0x0D, 0x80, 0x00, 0x00), $midsubnormal1);
+        $this->assertEquals(pack('C*',0xfa, 0x8D, 0x80, 0x00, 0x00), $midsubnormal2);
+        $this->assertEquals(pack('C*',0xfa, 0x00, 0x7f, 0xff, 0xff), $maxSubnormal);
+    }
+
+    function testDecodeFloat32Basic()
+    {
+        $decoded1 = Cbor::decode(pack('C*', 0xfa, 0x47, 0xc3, 0x50, 0x00));
+        $decoded2 = Cbor::decode(pack('C*', 0xfa, 0x32, 0x00, 0x00, 0x00));
+        $decoded3 = Cbor::decode(pack('C*', 0xfa, 0xb0, 0xc0, 0x00, 0x00));
+        $decoded4 = Cbor::decode(pack('C*', 0xfa, 0x3f, 0xc0, 0x00, 0x00));
+
+        $this->assertEquals(100000.0, $decoded1);
+        $this->assertEquals(pow(2, -1 * 27), $decoded2);
+        $this->assertEquals(-(pow(2, -30) + pow(2,-31)), $decoded3);
+        $this->assertEquals(1.5, $decoded4);
+    }
+
+    function testDecodeFloat32Special()
+    {
+        $positiveZero = Cbor::decode(pack('C*', 0xfa, 0x00, 0x00, 0x00, 0x00));
+        $negativeZero = Cbor::decode(pack('C*', 0xfa, 0x80, 0x00, 0x00, 0x00)); // -0.0
+        $positiveInfinity = Cbor::decode(pack('C*', 0xfa, 0x7f, 0x80, 0x00, 0x00));
+        $negativeInfinity = Cbor::decode(pack('C*', 0xfa, 0xff, 0x80, 0x00, 0x00));
+        $nan = Cbor::decode(pack('C*', 0xfa, 0x7f, 0x80, 0x00, 0x01));
+
+        $this->assertEquals(0.0, $positiveZero);
+        $this->assertEquals(0.0, $negativeZero);
+        $this->assertEquals(INF, $positiveInfinity);
+        $this->assertEquals(-INF, $negativeInfinity);
+        $this->assertTrue(is_nan($nan));
+    }
+
+    function testDecodeFloat32Subnormal()
+    {
+        $minSubnormal = Cbor::decode(pack('C*',0xfa, 0x00, 0x00, 0x00, 0x01));
+        $midsubnormal1 = Cbor::decode(pack('C*',0xfa, 0x0D, 0x80, 0x00, 0x00));
+        $midsubnormal2 = Cbor::decode(pack('C*',0xfa, 0x8D, 0x80, 0x00, 0x00));
+        $maxSubnormal = Cbor::decode(pack('C*',0xfa, 0x00, 0x7f, 0xff, 0xff));
+
+        $this->assertEquals(pow(2, -149), $minSubnormal);
+        $this->assertEquals(pow(2, -100), $midsubnormal1);
+        $this->assertEquals(-pow(2, -100), $midsubnormal2);
+        $this->assertEquals(pow(2, -126) - pow(2, -149), $maxSubnormal);
+    }
+
+    function testEncodeFloat64Basic()
+    {
+        $encoded1 = Cbor::encode(1.7);
+        $encoded2 = Cbor::encode(0.3);
+        $encoded3 = Cbor::encode(-0.3);
+        $encoded4 = Cbor::encode(1.46936785094670536465985373879E-39);
+
+        $this->assertEquals(pack('C*', 0xfb, 0x3f, 0xfb, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), $encoded1);
+        $this->assertEquals(pack('C*', 0xfb, 0x3f, 0xd3, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), $encoded2);
+        $this->assertEquals(pack('C*', 0xfb, 0xbf, 0xd3, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), $encoded3);
+        $this->assertEquals(pack('C*', 0xfb, 0x37, 0xdf, 0xff, 0xff, 0xe0, 0x00, 0x00, 0x00), $encoded4);
+    }
+
+    function testEncodeFloat64Subnormal()
+    {
+        $minSubnormal = Cbor::encode(pow(2, -1 * 1074));
+        $midSubnormal1 = Cbor::encode(5.66634007902408836585223217165E-319);
+        $midSubnormal2 = Cbor::encode(-5.66634007902408836585223217165E-319);
+        $maxSubnormal = Cbor::encode(pow(2, -1022) - pow(2, -1074));
+
+        $this->assertEquals(pack('C*', 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01), $minSubnormal);
+        $this->assertEquals(pack('C*', 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xc0, 0x00), $midSubnormal1);
+        $this->assertEquals(pack('C*', 0xfb, 0x80, 0x00, 0x00, 0x00, 0x00, 0x01, 0xc0, 0x00), $midSubnormal2);
+        $this->assertEquals(pack('C*', 0xfb, 0x00, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff), $maxSubnormal);
+    }
+
+    function testDecodeFloat64Basic()
+    {
+        $decoded1 = Cbor::decode(pack('C*', 0xfb, 0x3f, 0xfb, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33));
+        $decoded2 = Cbor::decode(pack('C*', 0xfb, 0x3f, 0xd3, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33));
+        $decoded3 = Cbor::decode(pack('C*', 0xfb, 0xbf, 0xd3, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33));
+        $decoded4 = Cbor::decode(pack('C*', 0xfb, 0x37, 0xdf, 0xff, 0xff, 0xe0, 0x00, 0x00, 0x00));
+
+        $this->assertEquals(1.7, $decoded1);
+        $this->assertEquals(0.3, $decoded2);
+        $this->assertEquals(-0.3, $decoded3);
+        $this->assertEquals(1.46936785094670536465985373879E-39, $decoded4);
+    }
+
+    function testDecodeFloat64Special()
+    {
+        $positiveZero = Cbor::decode(pack('C*', 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+        $negativeZero = Cbor::decode(pack('C*', 0xfb, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)); // -0.0
+        $positiveInfinity = Cbor::decode(pack('C*', 0xfb, 0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+        $negativeInfinity = Cbor::decode(pack('C*', 0xfb, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+        $nan = Cbor::decode(pack('C*', 0xfb, 0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01));
+
+        $this->assertEquals(0.0, $positiveZero);
+        $this->assertEquals(0.0, $negativeZero);
+        $this->assertEquals(INF, $positiveInfinity);
+        $this->assertEquals(-INF, $negativeInfinity);
+        $this->assertTrue(is_nan($nan));
+    }
+
+    function testDecodeFloat64Subnormal()
+    {
+        $minSubnormal = Cbor::decode(pack('C*', 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01));
+        $midsubnormal1 = Cbor::decode(pack('C*', 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xc0, 0x00));
+        $midsubnormal2 = Cbor::decode(pack('C*', 0xfb, 0x80, 0x00, 0x00, 0x00, 0x00, 0x01, 0xc0, 0x00));
+        $maxSubnormal = Cbor::decode(pack('C*', 0xfb, 0x00, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff));
+
+        $this->assertEquals(pow(2, -1 * 1074), $minSubnormal);
+        $this->assertEquals(5.66634007902408836585223217165E-319, $midsubnormal1);
+        $this->assertEquals(-5.66634007902408836585223217165E-319, $midsubnormal2);
+        $this->assertEquals(pow(2, -1022) - pow(2, -1074), $maxSubnormal);
     }
 
     function testDecodeByteString()
