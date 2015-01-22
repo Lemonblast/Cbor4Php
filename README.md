@@ -8,7 +8,7 @@ To install the library through composer, you simply need to add the following to
 ```JavaScript
 {
     "require": {
-       "lemonblast/cbor4php": "dev-master"
+       "lemonblast/cbor4php": "1.0.0"
     }
 }
 ```
